@@ -1,0 +1,34 @@
+{
+  "name": "cloudky-server",
+  "version": "1.0.0",
+  "description": "Self-hosted file sharing server",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run server/index.ts",
+    "watch": "bun --watch server/index.ts",
+    "build": "bun build server/index.ts --compile --minify --outfile ./cloudky-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rabbit-Company/Cloudky-Server.git"
+  },
+  "keywords": [
+    "cloudky",
+    "cloud",
+    "file",
+    "sharing"
+  ],
+  "author": "Rabbit Company",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Rabbit-Company/Cloudky-Server/issues"
+  },
+  "homepage": "https://github.com/Rabbit-Company/Cloudky-Server#readme",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
