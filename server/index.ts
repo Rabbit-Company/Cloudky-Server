@@ -3,9 +3,14 @@ import Errors from './errors.ts';
 import Logger from '@rabbit-company/logger';
 import Redis from './database/redis.ts';
 import SQLite from './database/sqlite.ts';
+import MySQL from './database/mysql.ts';
 
 Redis.initialize();
-SQLite.initialize();
+if(process.env.DB_TYPE === 'mysql'){
+	MySQL.initialize();
+}else{
+	SQLite.initialize();
+}
 
 Logger.level = Number(process.env.LOGGER_LEVEL) || 6;
 
