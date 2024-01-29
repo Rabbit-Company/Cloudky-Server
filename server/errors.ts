@@ -1,0 +1,36 @@
+export default class Errors{
+
+	static list: { [key: number]: string } = {
+		0: 'Success',
+		404: 'Invalid API endpoint',
+		1000: 'Bearer Token is missing in Authorization header.',
+		1001: 'Not all required data provided in json format.',
+		1002: 'Project name can only contain lowercase characters, numbers and hyphens. It also needs to start with lowercase character and be between 4 and 30 characters long.',
+		1003: 'Username can only contain lowercase characters, numbers and hyphens. It also needs to start with lowercase character and be between 4 and 30 characters long.',
+		1004: 'Password needs to be hashed with Blake2b. The length of hashed password needs to be 128 characters.',
+		1005: 'Project with this name already exists!',
+		1006: 'Provided project is invalid!',
+		1007: 'Username is already registered.',
+		1008: 'Provided API Secret Key in Bearer Token is invalid.',
+		1009: 'Provided email is invalid.',
+		1010: 'Provided transactionID is invalid.',
+		1011: 'Username and Password are missing in Authorization header.',
+		1012: 'Provided username is invalid.',
+		1013: 'Provided password is invalid.',
+		1014: 'Password is incorrect.',
+		1015: 'Redis connection error.',
+		1016: 'Provided token is invalid.',
+		1017: 'Provided token is incorrect or it has expired.',
+		1018: 'Username and Token are missing in Authorization header.',
+		2000: 'Something went wrong while trying to perform this action. Please try again later.',
+		9999: 'Your do not have permission to perform this action.'
+	};
+
+	static get(id: number){
+		return this.list[id];
+	}
+
+	static getJson(id: number){
+		return { 'error': id, 'info': this.list[id] };
+	}
+}
