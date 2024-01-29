@@ -6,7 +6,14 @@ export default class MySQL{
 		port: Number(process.env.MYSQL_PORT || 3306),
 		database: process.env.MYSQL_DATABASE,
 		user: process.env.MYSQL_USER,
-		password: process.env.MYSQL_PASSWORD
+		password: process.env.MYSQL_PASSWORD,
+		waitForConnections: true,
+		connectionLimit: 10,
+		maxIdle: 10,
+		idleTimeout: 60000,
+		queueLimit: 0,
+		enableKeepAlive: true,
+		keepAliveInitialDelay: 0
 	});
 
 	static initialize(){
@@ -20,8 +27,8 @@ export default class MySQL{
 				"BackupCodes" VARCHAR(69),
 				"StorageUsed" INT NOT NULL,
 				"StorageLimit" INT NOT NULL,
-				"Created" INT NOT NULL,
-				"Accessed" INT NOT NULL
+				"Created" BIGINT NOT NULL,
+				"Accessed" BIGINT NOT NULL
 			);
 		`);
 	}
