@@ -2,8 +2,10 @@ import Utils from './utils.ts';
 import Errors from './errors.ts';
 import Logger from '@rabbit-company/logger';
 import Redis from './database/redis.ts';
+import SQLite from './database/sqlite.ts';
 
 Redis.initialize();
+SQLite.initialize();
 
 Logger.level = Number(process.env.LOGGER_LEVEL) || 6;
 
