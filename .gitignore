@@ -1,6 +1,9 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
 cloudky-server
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 
 # Logs
 
