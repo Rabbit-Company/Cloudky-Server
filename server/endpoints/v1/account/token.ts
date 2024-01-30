@@ -15,6 +15,7 @@ export default async function handleAccountToken(req: Request, match: MatchedRou
 	if(!Validate.password(auth.pass)) return Utils.jsonResponse(Errors.getJson(1013));
 
 	let result = SQLite.DB.prepare('SELECT "Password" FROM "Accounts" WHERE "Username" = ?').get(auth.user) as { password: string } | null | undefined;
+	if(result === null) return Utils.jsonResponse(Errors.getJson(2000));
 	if(!result) return Utils.jsonResponse(Errors.getJson(1012));
 
 	if(!(await Bun.password.verify(auth.pass, result.password))) return Utils.jsonResponse(Errors.getJson(1014));

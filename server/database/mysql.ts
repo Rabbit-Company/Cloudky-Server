@@ -1,5 +1,6 @@
 import Logger from '@rabbit-company/logger';
 import mysql, { type Pool } from 'mysql2/promise';
+import DB from './database';
 
 export default class MySQL{
 	static DB : Pool = mysql.createPool({
@@ -18,7 +19,7 @@ export default class MySQL{
 	});
 
 	static async initialize(){
-		await MySQL.DB.execute(`
+		let res = await DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
 				"Username" VARCHAR(30) NOT NULL PRIMARY KEY,
 				"Email" VARCHAR(255) NOT NULL,
@@ -31,9 +32,8 @@ export default class MySQL{
 				"Created" BIGINT NOT NULL,
 				"Accessed" BIGINT NOT NULL
 			);
-		`).catch(() => {
-			Logger.error('Connection to MySQL server has failed!');
-			process.exit();
-		});
+	`, []);
+
+		if(res === null) process.exit();
 	}
 }

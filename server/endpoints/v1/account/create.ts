@@ -18,6 +18,7 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 	if(!Validate.password(data.password)) return Utils.jsonResponse(Errors.getJson(1004));
 
 	let results = await DB.prepare('SELECT * FROM "Accounts" WHERE "Username" = ?', [data.username]);
+	if(results === null) return Utils.jsonResponse(Errors.getJson(2000));
 	if(results.length !== 0) return Utils.jsonResponse(Errors.getJson(1007));
 
 	data.password = await Bun.password.hash(data.password);

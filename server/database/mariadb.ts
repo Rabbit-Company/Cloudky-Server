@@ -1,5 +1,6 @@
 import Logger from '@rabbit-company/logger';
 import mariadb from 'mariadb';
+import DB from './database';
 
 export default class MariaDB{
 	static DB = mariadb.createPool({
@@ -15,7 +16,7 @@ export default class MariaDB{
 	});
 
 	static async initialize(){
-		await MariaDB.DB.query(`
+		let res = await DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
 				"Username" VARCHAR(30) NOT NULL PRIMARY KEY,
 				"Email" VARCHAR(255) NOT NULL,
@@ -28,9 +29,8 @@ export default class MariaDB{
 				"Created" BIGINT NOT NULL,
 				"Accessed" BIGINT NOT NULL
 			);
-		`).catch(() => {
-			Logger.error('Connection to MariaDB server has failed!');
-			process.exit();
-		});
+	`, []);
+
+		if(res === null) process.exit();
 	}
 }
