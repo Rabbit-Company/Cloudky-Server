@@ -1,24 +1,21 @@
 import Logger from '@rabbit-company/logger';
-import mysql, { type Pool } from 'mysql2/promise';
+import mariadb from 'mariadb';
 
-export default class MySQL{
-	static DB : Pool = mysql.createPool({
-		host: process.env.MYSQL_HOST,
-		port: Number(process.env.MYSQL_PORT || 3306),
-		database: process.env.MYSQL_DATABASE,
-		user: process.env.MYSQL_USER,
-		password: process.env.MYSQL_PASSWORD,
-		waitForConnections: true,
+export default class MariaDB{
+	static DB = mariadb.createPool({
+		host: process.env.MARIADB_HOST,
+		port: Number(process.env.MARIADB_PORT || 3306),
+		database: process.env.MARIADB_DATABASE,
+		user: process.env.MARIADB_USER,
+		password: process.env.MARIADB_PASSWORD,
 		connectionLimit: 10,
-		maxIdle: 10,
 		idleTimeout: 0,
-		queueLimit: 0,
-		enableKeepAlive: true,
-		keepAliveInitialDelay: 0
+		keepAliveDelay: 0,
+		acquireTimeout: 3000
 	});
 
 	static async initialize(){
-		await MySQL.DB.execute(`
+		await MariaDB.DB.query(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
 				"Username" VARCHAR(30) NOT NULL PRIMARY KEY,
 				"Email" VARCHAR(255) NOT NULL,
@@ -32,7 +29,7 @@ export default class MySQL{
 				"Accessed" BIGINT NOT NULL
 			);
 		`).catch(() => {
-			Logger.error('Connection to MySQL server has failed!');
+			Logger.error('Connection to MariaDB server has failed!');
 			process.exit();
 		});
 	}

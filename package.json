@@ -34,6 +34,7 @@
   "dependencies": {
     "@rabbit-company/logger": "^2.1.1",
     "ioredis": "^5.3.2",
+    "mariadb": "^3.2.3",
     "mysql2": "^3.9.1"
   }
 }

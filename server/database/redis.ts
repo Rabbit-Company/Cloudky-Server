@@ -7,10 +7,10 @@ export default class Redis{
 
 	static async initialize(){
 		Redis.localCache.on('error', () => {
-			Logger.error('Redis connection error!');
+			Logger.error('Local Redis connection error!');
 		});
     Redis.externalCache.on('error', () => {
-			Logger.error('Redis connection error!');
+			Logger.error('External Redis connection error!');
 		});
 	}
 
