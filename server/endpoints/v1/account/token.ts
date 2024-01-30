@@ -1,9 +1,9 @@
 import { type MatchedRoute } from "bun";
 import Redis from "../../../database/redis";
-import SQLite from "../../../database/sqlite";
 import Errors from "../../../errors";
 import Utils from "../../../utils";
 import Validate from "../../../validate";
+import DB from "../../../database/database";
 
 export default async function handleAccountToken(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'GET') return Utils.jsonResponse(Errors.getJson(404));
@@ -14,11 +14,11 @@ export default async function handleAccountToken(req: Request, match: MatchedRou
 	if(!Validate.username(auth.user)) return Utils.jsonResponse(Errors.getJson(1012));
 	if(!Validate.password(auth.pass)) return Utils.jsonResponse(Errors.getJson(1013));
 
-	let result = SQLite.DB.prepare('SELECT "Password" FROM "Accounts" WHERE "Username" = ?').get(auth.user) as { password: string } | null | undefined;
+	let result = await DB.prepare('SELECT "Password" FROM "Accounts" WHERE "Username" = ?', [auth.user]);
 	if(result === null) return Utils.jsonResponse(Errors.getJson(2000));
-	if(!result) return Utils.jsonResponse(Errors.getJson(1012));
+	if(result.length !== 1) return Utils.jsonResponse(Errors.getJson(1012));
 
-	if(!(await Bun.password.verify(auth.pass, result.password))) return Utils.jsonResponse(Errors.getJson(1014));
+	if(!(await Bun.password.verify(auth.pass, result[0].Password))) return Utils.jsonResponse(Errors.getJson(1014));
 
 	let hashedIP = await Utils.generateHash(ip || '', 'sha256');
 	let newToken = Utils.generateRandomText(128);
