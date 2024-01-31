@@ -18,7 +18,7 @@ export default class S3{
 		},
 	});
 
-	static async listObjects(prefix: string = '/', startAfter: string | undefined = undefined) : Promise<_Object[] | null>{
+	static async listObjects(prefix: string = '/', startAfter: string | undefined = undefined) : Promise<_Object[] | boolean | null>{
 		try{
 			let res = await this.S3.send(new ListObjectsV2Command({
 				Bucket: process.env.S3_BUCKET_NAME,
@@ -28,11 +28,34 @@ export default class S3{
 				StartAfter: startAfter
 			}));
 
-			if(res.Contents === undefined) return null;
+			if(res.Contents === undefined) return false;
 			return res.Contents;
 		}catch(err){
 			Logger.error(`[S3] ${err}`);
 			return null;
 		}
+	}
+
+	static async listUserFiles(username: string) : Promise<_Object[] | null>{
+		let files: _Object[] = [];
+		let lastKey : string | undefined;
+		while(true){
+			let res = await this.listObjects(`data/${username}/`, lastKey);
+			if(res === null) return null;
+			if(res === false || res === true) break;
+			files.push(...res);
+			lastKey = files[files.length - 1].Key;
+		}
+
+		let ufiles = files
+			.filter(file => file.Key !== undefined && file.Size !== undefined && file.LastModified !== undefined)
+			.map(({ Key, LastModified, Size }) => ({
+				Key: Key!.replace(`data/${username}/`, ''),
+				LastModified: LastModified!,
+				Size: Size!
+			})
+		);
+
+    return ufiles;
 	}
 }
