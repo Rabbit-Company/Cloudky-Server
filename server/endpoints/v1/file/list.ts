@@ -3,7 +3,7 @@ import Errors from "../../../errors";
 import Utils from "../../../utils";
 import Validate from "../../../validate";
 import Redis from "../../../database/redis";
-import S3 from "../../../database/s3storage";
+import Storage from "../../../storage/storage";
 
 export default async function handleFileList(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'GET') return Utils.jsonResponse(Errors.getJson(404));
@@ -26,7 +26,7 @@ export default async function handleFileList(req: Request, match: MatchedRoute |
 		fromCache = true;
 	}
 
-	if(result === null) result = await S3.listUserFiles(auth.user);
+	if(result === null) result = await Storage.listUserFiles(auth.user);
 	if(result === null) return Utils.jsonResponse(Errors.getJson(2000));
 
 	if(!fromCache) await Redis.setString(`filelist_${auth.user}`, JSON.stringify(result), 10, 10);

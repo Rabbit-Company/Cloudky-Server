@@ -36,7 +36,7 @@ export default class S3{
 		}
 	}
 
-	static async listUserFiles(username: string) : Promise<_Object[] | null>{
+	static async listUserFiles(username: string) : Promise<{Key: string; LastModified: string; Size: number;}[] | null>{
 		let files: _Object[] = [];
 		let lastKey : string | undefined;
 		while(true){
@@ -51,7 +51,7 @@ export default class S3{
 			.filter(file => file.Key !== undefined && file.Size !== undefined && file.LastModified !== undefined)
 			.map(({ Key, LastModified, Size }) => ({
 				Key: Key!.replace(`data/${username}/`, ''),
-				LastModified: LastModified!,
+				LastModified: LastModified!.toISOString(),
 				Size: Size!
 			})
 		);
