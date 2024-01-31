@@ -4,8 +4,8 @@ import Logger from '@rabbit-company/logger';
 import Redis from './database/redis.ts';
 import DB from './database/database.ts';
 
-Redis.initialize();
-DB.initialize();
+await Redis.initialize();
+await DB.initialize();
 
 Logger.level = Number(process.env.LOGGER_LEVEL) || 6;
 

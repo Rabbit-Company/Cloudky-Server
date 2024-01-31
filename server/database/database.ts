@@ -14,7 +14,7 @@ export default class DB{
 		}else if(process.env.DB_TYPE === 'sqlite'){
 			SQLite.initialize();
 		}else{
-			Logger.error(`Unsupported database type: ${process.env.DB_TYPE}`);
+			Logger.error(`[DB] Unsupported database type: ${process.env.DB_TYPE}`);
 			process.exit();
 		}
 	}
@@ -30,11 +30,11 @@ export default class DB{
       }else if(process.env.DB_TYPE === 'sqlite'){
         return SQLite.DB.prepare(query, values).all();
       }else{
-				Logger.error(`Unsupported database type: ${process.env.DB_TYPE}`);
+				Logger.error(`[DB] Unsupported database type: ${process.env.DB_TYPE}`);
 				process.exit();
       }
     }catch(error){
-			Logger.error('Database error: ' + error);
+			Logger.error('[DB] ' + error);
       return null;
     }
 	}
@@ -51,11 +51,11 @@ export default class DB{
 				SQLite.DB.prepare(query, values).run();
 				return true;
 			}else{
-				Logger.error(`Unsupported database type: ${process.env.DB_TYPE}`);
+				Logger.error(`[DB] Unsupported database type: ${process.env.DB_TYPE}`);
 				process.exit();
 			}
 		}catch(error){
-			Logger.error('Database error: ' + error);
+			Logger.error('[DB] ' + error);
       return null;
 		}
 	}

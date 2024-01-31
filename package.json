@@ -32,6 +32,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.503.1",
     "@rabbit-company/logger": "^2.1.1",
     "ioredis": "^5.3.2",
     "mariadb": "^3.2.3",

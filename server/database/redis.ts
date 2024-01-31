@@ -7,10 +7,10 @@ export default class Redis{
 
 	static async initialize(){
 		Redis.localCache.on('error', () => {
-			Logger.error('Local Redis connection error!');
+			Logger.error('[REDIS] Local Redis connection error!');
 		});
     Redis.externalCache.on('error', () => {
-			Logger.error('External Redis connection error!');
+			Logger.error('[REDIS] External Redis connection error!');
 		});
 	}
 
@@ -27,7 +27,7 @@ export default class Redis{
 
 			return null;
 		}catch{
-			Logger.error('Redis connection error!');
+			Logger.error('[REDIS] Connection error!');
 			return null;
 		}
 	}
@@ -51,7 +51,7 @@ export default class Redis{
 			if(externalTTL !== 0) await Redis.externalCache.set(key, value, 'EX', externalTTL);
 			return value;
 		}catch{
-			Logger.error('Redis connection error!');
+			Logger.error('[REDIS] Connection error!');
 			return null;
 		}
 	}

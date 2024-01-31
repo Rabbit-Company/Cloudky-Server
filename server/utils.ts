@@ -54,7 +54,7 @@ export default class Utils{
 	static generateRandomText(length: number) : string {
 		const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		const keyArray = new Uint8Array(length);
-		crypto.getRandomValues(keyArray);
+		(crypto as any).getRandomValues(keyArray);
 
 		let apiKey = '';
 		for (let i = 0; i < keyArray.length; i++) {
