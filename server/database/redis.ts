@@ -32,6 +32,17 @@ export default class Redis{
 		}
 	}
 
+	static async setString(key: string, value: string, localTTL: number = 0, externalTTL: number = 0): Promise<boolean | null>{
+		try{
+			if(localTTL !== 0) await Redis.localCache.set(key, value, 'EX', localTTL);
+			if(externalTTL !== 0) await Redis.externalCache.set(key, value, 'EX', externalTTL);
+			return true;
+		}catch{
+			Logger.error('[REDIS] Connection error!');
+			return null;
+		}
+	}
+
 	static async getOrSetString(key: string, value: string, localTTL: number = 0, externalTTL: number = 0): Promise<string | null>{
 		try{
 			if(localTTL !== 0){
