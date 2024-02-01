@@ -29,7 +29,7 @@ export default async function handleFileUpload(req: Request, match: MatchedRoute
 	const file = formdata.get('file');
 
 	if(!Validate.userFilePathName(key)) return Utils.jsonResponse(Errors.getJson(1005));
-	if (!(file instanceof File) || file.size === undefined) {
+	if(!(file instanceof File) || file.size === undefined) {
     return Utils.jsonResponse(Errors.getJson(1006));
   }
 

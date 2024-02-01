@@ -4,6 +4,7 @@ import Utils from "../../../utils";
 import Validate from "../../../validate";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
+import DB from "../../../database/database";
 
 export default async function handleFileList(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'GET') return Utils.jsonResponse(Errors.getJson(404));
@@ -20,7 +21,7 @@ export default async function handleFileList(req: Request, match: MatchedRoute |
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
 
 	let fromCache = false;
-	let result: any = await Redis.getString(`filelist_${auth.user}`, 10);
+	let result: any = await Redis.getString(`filelist_${auth.user}`, 60);
 	if(result !== null){
 		result = JSON.parse(result);
 		fromCache = true;
@@ -29,7 +30,12 @@ export default async function handleFileList(req: Request, match: MatchedRoute |
 	if(result === null) result = await Storage.listUserFiles(auth.user);
 	if(result === null) return Utils.jsonResponse(Errors.getJson(2000));
 
-	if(!fromCache) await Redis.setString(`filelist_${auth.user}`, JSON.stringify(result), 10, 10);
+	if(!fromCache){
+		let storageUsage = Math.floor(Storage.calculateStorageUsage(result));
+		await Redis.setString(`filelist_${auth.user}`, JSON.stringify(result), 60, 300);
+		await Redis.setString(`storageUsage_${auth.user}`, storageUsage.toString(), 60, 300);
+		await DB.prepareModify('UPDATE "Accounts" SET "StorageUsed" = ? WHERE "Username" = ?', [storageUsage, auth.user]);
+	}
 
 	return Utils.jsonResponse({ 'error': 0, 'info': 'Success', 'data': result});
 }
