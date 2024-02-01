@@ -26,6 +26,7 @@ export default class MariaDB{
 				"BackupCodes" VARCHAR(69),
 				"StorageUsed" INT NOT NULL,
 				"StorageLimit" INT NOT NULL,
+				"Type" INT NOT NULL,
 				"Created" BIGINT NOT NULL,
 				"Accessed" BIGINT NOT NULL
 			);

@@ -15,6 +15,7 @@ export default class SQLite{
 				"BackupCodes" TEXT,
 				"StorageUsed" INTEGER NOT NULL,
 				"StorageLimit" INTEGER NOT NULL,
+				"Type" INTEGER NOT NULL,
 				"Created" INTEGER NOT NULL,
 				"Accessed" INTEGER NOT NULL
 			);

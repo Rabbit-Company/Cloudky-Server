@@ -19,7 +19,7 @@ const router = new Bun.FileSystemRouter({
 Bun.serve({
 	port: process.env.SERVER_PORT,
 	hostname: process.env.SERVER_HOSTNAME,
-	development: true,
+	development: false,
 	async fetch(req, server) {
 		const url = new URL(req.url);
 		const path = url.pathname;

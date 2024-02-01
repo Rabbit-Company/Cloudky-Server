@@ -19,7 +19,7 @@ export default async function handleAccountData(req: Request, match: MatchedRout
 	if(!Validate.token(token)) return Utils.jsonResponse(Errors.getJson(1017));
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
 
-	let result: any = await DB.prepare(`SELECT "Email","StorageUsed","StorageLimit","Created" FROM "Accounts" WHERE "Username" = ?`, [auth.user]);
+	let result: any = await DB.prepare(`SELECT "Email","StorageUsed","StorageLimit","Type","Created" FROM "Accounts" WHERE "Username" = ?`, [auth.user]);
 	if(result === null) return Utils.jsonResponse(Errors.getJson(2000));
 
 	return Utils.jsonResponse({ 'error': 0, 'info': 'Success', 'data': result[0]});

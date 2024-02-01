@@ -28,7 +28,13 @@ export default class Validate{
 	static userFilePathName(filePathName: string | null | undefined): boolean{
 		if(typeof(filePathName) !== 'string') return false;
 		if(filePathName.includes('..')) return false;
-		return /^[a-zA-Z0-9\/_-]+$/.test(filePathName);
+		return /^[a-zA-Z0-9\/_. -]+$/.test(filePathName);
+	}
+
+	static accountType(accountType: string | number | null | undefined): boolean{
+		if(typeof(accountType) !== 'string' && typeof(accountType) !== 'number') return false;
+		if(![0, 1].includes(Number(accountType))) return false;
+		return true;
 	}
 
 }

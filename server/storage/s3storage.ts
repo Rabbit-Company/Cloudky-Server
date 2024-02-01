@@ -6,9 +6,11 @@ import {
 	type _Object,
 	CreateMultipartUploadCommand,
 	UploadPartCommand,
-	CompleteMultipartUploadCommand
+	CompleteMultipartUploadCommand,
+	PutObjectCommand
 } from "@aws-sdk/client-s3";
 import type { FileInformation } from './storage';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export default class S3{
 	static S3 = new S3Client({
@@ -32,6 +34,42 @@ export default class S3{
 
 			if(res.Contents === undefined) return false;
 			return res.Contents;
+		}catch(err){
+			Logger.error(`[S3] ${err}`);
+			return null;
+		}
+	}
+
+	static async getObjectLink(key: string, expiresIn: number = 3600): Promise<string | null>{
+		try{
+			return await getSignedUrl(this.S3, new GetObjectCommand({
+				Bucket: process.env.S3_BUCKET_NAME,
+				Key: key
+			}), { expiresIn: expiresIn });
+		}catch(err){
+			Logger.error(`[S3] ${err}`);
+			return null;
+		}
+	}
+
+	static async putObjectLink(key: string, expiresIn: number = 3600): Promise<string | null>{
+		try{
+			return await getSignedUrl(this.S3, new PutObjectCommand({
+				Bucket: process.env.S3_BUCKET_NAME,
+				Key: key
+			}), { expiresIn: expiresIn });
+		}catch(err){
+			Logger.error(`[S3] ${err}`);
+			return null;
+		}
+	}
+
+	static async getObjectMultipartUploadLink(key: string, expiresIn: number = 3600): Promise<string | null>{
+		try{
+			return await getSignedUrl(this.S3, new CreateMultipartUploadCommand({
+				Bucket: process.env.S3_BUCKET_NAME,
+				Key: key
+			}), { expiresIn: expiresIn });
 		}catch(err){
 			Logger.error(`[S3] ${err}`);
 			return null;
@@ -110,5 +148,13 @@ export default class S3{
 
 	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{
 		return await this.putObject(`data/${username}/${key}`, body);
+	}
+
+	static async getUserObjectLink(username: string, key: string): Promise<string | null>{
+		return await this.getObjectLink(`data/${username}/${key}`, 43200);
+	}
+
+	static async getUserMultipartUploadLink(username: string, key: string): Promise<string | null>{
+		return await this.getObjectMultipartUploadLink(`data/${username}/${key}`, 43200);
 	}
 }

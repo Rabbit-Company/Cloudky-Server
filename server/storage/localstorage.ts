@@ -4,6 +4,7 @@ import {
 	type _Object
 } from "@aws-sdk/client-s3";
 import type { FileInformation } from './storage';
+import type { BunFile } from 'bun';
 
 export default class LocalStorage{
 
@@ -35,6 +36,16 @@ export default class LocalStorage{
 			return true;
 		}catch{
 			return false;
+		}
+	}
+
+	static async downloadUserFile(username: string, key: string): Promise<BunFile | null>{
+		try{
+			let file = Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`);
+			if(!await file.exists()) return null;
+			return file;
+		}catch{
+			return null;
 		}
 	}
 }

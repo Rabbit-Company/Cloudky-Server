@@ -22,6 +22,7 @@ export default class Errors{
 		1016: 'Provided token is invalid.',
 		1017: 'Provided token is incorrect or it has expired.',
 		1018: 'Username and Token are missing in Authorization header.',
+		1019: 'Provided account type in invalid.',
 		2000: 'Something went wrong while trying to perform this action. Please try again later.',
 		9999: 'Your do not have permission to perform this action.'
 	};
