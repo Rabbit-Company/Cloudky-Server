@@ -8,6 +8,7 @@ import {
 	UploadPartCommand,
 	CompleteMultipartUploadCommand
 } from "@aws-sdk/client-s3";
+import type { FileInformation } from './storage';
 
 export default class S3{
 	static S3 = new S3Client({
@@ -84,7 +85,7 @@ export default class S3{
 		}
 	}
 
-	static async listUserFiles(username: string) : Promise<{Key: string; LastModified: string; Size: number;}[] | null>{
+	static async listUserFiles(username: string) : Promise<FileInformation[] | null>{
 		let files: _Object[] = [];
 		let lastKey : string | undefined;
 		while(true){

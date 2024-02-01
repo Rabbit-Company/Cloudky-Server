@@ -9,7 +9,7 @@ export default async function handleFileUpload(req: Request, match: MatchedRoute
 	if(req.method !== 'POST') return Utils.jsonResponse(Errors.getJson(404));
 
 	const contentLength = req.headers.get('Content-Length');
-	if (contentLength && parseInt(contentLength, 10) > 53_687_091_200) {
+	if(contentLength && parseInt(contentLength, 10) > 53_687_091_200) {
     return Utils.jsonResponse(Errors.getJson(1010));
   }
 

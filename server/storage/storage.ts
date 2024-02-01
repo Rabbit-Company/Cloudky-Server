@@ -5,9 +5,15 @@ import {
 import S3 from './s3storage';
 import LocalStorage from './localstorage';
 
+export interface FileInformation {
+  Key: string;
+  LastModified: string;
+  Size: number;
+}
+
 export default class Storage{
 
-	static async listUserFiles(username: string): Promise<{Key: string; LastModified: string; Size: number;}[] | null>{
+	static async listUserFiles(username: string): Promise<FileInformation[] | null>{
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.listUserFiles(username);
 		}
@@ -19,5 +25,13 @@ export default class Storage{
 			return await S3.uploadUserFile(username, key, body);
 		}
 		return LocalStorage.uploadUserFile(username, key, body);
+	}
+
+	static calculateStorageUsage(files: FileInformation[]): number{
+		let storageUsed = 0;
+		files.forEach(file => {
+			storageUsed += file.Size;
+		});
+		return storageUsed / (1024 * 1024);
 	}
 }
