@@ -27,4 +27,13 @@ export default class LocalStorage{
 			return [];
 		}
 	}
+
+	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean>{
+		try{
+			await Bun.write(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`, body, { createPath: true });
+			return true;
+		}catch{
+			return false;
+		}
+	}
 }

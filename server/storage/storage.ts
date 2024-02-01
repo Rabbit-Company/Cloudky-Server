@@ -1,5 +1,4 @@
 import Logger from '@rabbit-company/logger';
-import { readdir } from "node:fs/promises";
 import {
 	type _Object
 } from "@aws-sdk/client-s3";
@@ -13,5 +12,12 @@ export default class Storage{
 			return await S3.listUserFiles(username);
 		}
 		return LocalStorage.listUserFiles(username);
+	}
+
+	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{
+		if(process.env.S3_ENABLED === 'true'){
+			return await S3.uploadUserFile(username, key, body);
+		}
+		return LocalStorage.uploadUserFile(username, key, body);
 	}
 }

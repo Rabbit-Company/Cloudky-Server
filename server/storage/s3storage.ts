@@ -3,9 +3,10 @@ import {
   S3Client,
   ListObjectsV2Command,
   GetObjectCommand,
-  PutObjectCommand,
-	type ListObjectsV2CommandOutput,
-	type _Object
+	type _Object,
+	CreateMultipartUploadCommand,
+	UploadPartCommand,
+	CompleteMultipartUploadCommand
 } from "@aws-sdk/client-s3";
 
 export default class S3{
@@ -36,6 +37,53 @@ export default class S3{
 		}
 	}
 
+	static async putObject(key: string, body: any) : Promise<boolean | null>{
+		try{
+			const createMultipartUpload = await this.S3.send(new CreateMultipartUploadCommand({
+				Bucket: process.env.S3_BUCKET_NAME,
+				Key: key
+			}));
+    	const uploadId = createMultipartUpload.UploadId;
+
+			const partSize = 5 * 1024 * 1024;
+			const totalParts = Math.ceil(body.length / partSize);
+
+			const uploadPromises = [];
+			for (let i = 0; i < totalParts; i++) {
+				const start = i * partSize;
+				const end = Math.min(start + partSize, body.length);
+
+				const uploadPartPromise = this.S3.send(new UploadPartCommand({
+					Bucket: process.env.S3_BUCKET_NAME,
+					Key: key,
+					PartNumber: i + 1,
+					UploadId: uploadId,
+					Body: body.slice(start, end),
+				}));
+
+				uploadPromises.push(uploadPartPromise);
+			}
+			const uploadPartResponses = await Promise.all(uploadPromises);
+
+			const parts = uploadPartResponses.map((response, index) => ({
+				ETag: response.ETag,
+				PartNumber: index + 1,
+			}));
+
+			await this.S3.send(new CompleteMultipartUploadCommand({
+				Bucket: process.env.S3_BUCKET_NAME,
+				Key: key,
+				UploadId: uploadId,
+				MultipartUpload: { Parts: parts },
+			}));
+
+			return true;
+		}catch(err){
+			Logger.error(`[S3] ${err}`);
+			return null;
+		}
+	}
+
 	static async listUserFiles(username: string) : Promise<{Key: string; LastModified: string; Size: number;}[] | null>{
 		let files: _Object[] = [];
 		let lastKey : string | undefined;
@@ -57,5 +105,9 @@ export default class S3{
 		);
 
     return ufiles;
+	}
+
+	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{
+		return await this.putObject(`data/${username}/${key}`, body);
 	}
 }

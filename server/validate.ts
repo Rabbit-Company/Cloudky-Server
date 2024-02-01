@@ -25,4 +25,10 @@ export default class Validate{
 		return token.length === 128;
 	}
 
+	static userFilePathName(filePathName: string | null | undefined): boolean{
+		if(typeof(filePathName) !== 'string') return false;
+		if(filePathName.includes('..')) return false;
+		return /^[a-zA-Z0-9\/_-]+$/.test(filePathName);
+	}
+
 }
