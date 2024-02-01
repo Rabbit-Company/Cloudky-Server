@@ -5,7 +5,7 @@ import Validate from "../../../validate";
 
 export default async function handleAccountCreate(req: Request): Promise<Response> {
 	if(req.method !== 'POST') return Utils.jsonResponse(Errors.getJson(404));
-	if(!process.env.ACCOUNT_CREATION) return Utils.jsonResponse(Errors.getJson(1002));
+	if(process.env.ACCOUNT_CREATION === 'false') return Utils.jsonResponse(Errors.getJson(1002));
 
 	let data: any;
 	try{
@@ -25,7 +25,7 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 	data.password = await Bun.password.hash(data.password);
 
 	let timestamp = Math.floor(Date.now() / 1000);
-	let result = await DB.prepareModify('INSERT INTO "Accounts"("Username","Email","Password","StorageUsed","StorageLimit","Created","Accessed") VALUES(?,?,?,?,?,?,?)', [data.username, data.email, data.password, 0, 0, timestamp, timestamp]);
+	let result = await DB.prepareModify('INSERT INTO "Accounts"("Username","Email","Password","StorageUsed","StorageLimit","Created","Accessed") VALUES(?,?,?,?,?,?,?)', [data.username, data.email, data.password, 0, Number(process.env.ACCOUNT_STORAGE_LIMIT), timestamp, timestamp]);
 	if(!result) return Utils.jsonResponse(Errors.getJson(2000));
 
 	return Utils.jsonResponse(Errors.getJson(0));
