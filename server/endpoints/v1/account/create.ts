@@ -5,6 +5,7 @@ import Validate from "../../../validate";
 
 export default async function handleAccountCreate(req: Request): Promise<Response> {
 	if(req.method !== 'POST') return Utils.jsonResponse(Errors.getJson(404));
+	if(!process.env.ACCOUNT_CREATION) return Utils.jsonResponse(Errors.getJson(1002));
 
 	let data: any;
 	try{
