@@ -1,4 +1,4 @@
-import Logger from '@rabbit-company/logger';
+import { Glob } from "bun";
 import { readdir } from "node:fs/promises";
 import {
 	type _Object
@@ -10,19 +10,18 @@ export default class LocalStorage{
 
 	static async listUserFiles(username: string): Promise<FileInformation[]>{
 		try{
+			const glob = new Glob("**");
 			const path = `${process.env.DATA_DIRECTORY}/data/${username}/`;
-			let res = await readdir(path, { recursive: true, withFileTypes: true });
-			let fileNames = res.filter(dirent => dirent.isFile()).map(dirent => dirent.name);
 
 			let files: FileInformation[] = [];
-			fileNames.forEach(fileName => {
+			for await (const fileName of glob.scan({cwd: path, dot: true, onlyFiles: true, absolute: false})) {
 				let file = Bun.file(`${path}/${fileName}`);
 				files.push({
 					Key: fileName,
 					LastModified: new Date(file.lastModified).toISOString(),
 					Size: file.size
 				});
-			});
+			}
 
 			return files;
 		}catch{

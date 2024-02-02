@@ -17,14 +17,14 @@ export default class Storage{
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.listUserFiles(username);
 		}
-		return LocalStorage.listUserFiles(username);
+		return await LocalStorage.listUserFiles(username);
 	}
 
 	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.uploadUserFile(username, key, body);
 		}
-		return LocalStorage.uploadUserFile(username, key, body);
+		return await LocalStorage.uploadUserFile(username, key, body);
 	}
 
 	static calculateStorageUsage(files: FileInformation[]): number{
