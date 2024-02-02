@@ -37,8 +37,9 @@ Bun.serve({
 		try{
 			const module = await import('./endpoints/' + src);
 			return await module.default(req, match, ip);
-		}catch{
-			return Utils.jsonResponse({}, 500);
+		}catch(err){
+			Logger.error(`[GENERAL] ${err}`);
+			return Utils.jsonResponse(Errors.getJson(2000), 500);
 		}
 	}
 });
