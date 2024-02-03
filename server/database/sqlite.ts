@@ -19,6 +19,19 @@ export default class SQLite{
 				"Created" INTEGER NOT NULL,
 				"Accessed" INTEGER NOT NULL
 			);
+
+			CREATE TABLE IF NOT EXISTS "ShareLinks"(
+				"Token" TEXT NOT NULL PRIMARY KEY,
+				"Path" TEXT NOT NULL,
+				"Username" TEXT NOT NULL,
+				"Password" TEXT,
+				"Downloaded" INTEGER NOT NULL,
+				"Expiration" INTEGER,
+				"Created" INTEGER NOT NULL,
+				"Accessed" INTEGER NOT NULL,
+				INDEX idx_expiration ("Expiration"),
+				INDEX idx_path_username ("Path", "Username")
+			);
 		`);
 	}
 }

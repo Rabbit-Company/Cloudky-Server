@@ -33,6 +33,19 @@ export default class MySQL{
 				"Created" BIGINT NOT NULL,
 				"Accessed" BIGINT NOT NULL
 			);
+
+			CREATE TABLE IF NOT EXISTS "ShareLinks"(
+				"Token" VARCHAR(15) NOT NULL PRIMARY KEY,
+				"Path" VARCHAR(4096) NOT NULL,
+				"Username" VARCHAR(30) NOT NULL,
+				"Password" VARCHAR(255),
+				"Downloaded" INT NOT NULL,
+				"Expiration" BIGINT,
+				"Created" BIGINT NOT NULL,
+				"Accessed" BIGINT NOT NULL,
+				INDEX idx_expiration ("Expiration"),
+				INDEX idx_path_username ("Path", "Username")
+			);
 	`, []);
 
 		if(res === null) process.exit();
