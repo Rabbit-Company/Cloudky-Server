@@ -28,10 +28,11 @@ export default class SQLite{
 				"Downloaded" INTEGER NOT NULL,
 				"Expiration" INTEGER,
 				"Created" INTEGER NOT NULL,
-				"Accessed" INTEGER NOT NULL,
-				INDEX idx_expiration ("Expiration"),
-				INDEX idx_path_username ("Path", "Username")
+				"Accessed" INTEGER NOT NULL
 			);
+
+			CREATE INDEX IF NOT EXISTS idx_expiration ON "ShareLinks" ("Expiration");
+			CREATE INDEX IF NOT EXISTS idx_path_username ON "ShareLinks" ("Path", "Username");
 		`);
 	}
 }
