@@ -19,7 +19,8 @@ export async function saveChunk(chunkData: ChunkData, data: Buffer): Promise<boo
 	try{
 		await Bun.write(targetPath, data, { createPath: true });
 	}catch(err){
-		Logger.error('[CHUNK] Saving')
+		Logger.error('[CHUNK] Saving');
+		return false;
 	}
 
 	chunkData.completed.add(hash);
