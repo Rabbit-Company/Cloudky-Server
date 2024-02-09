@@ -4,14 +4,9 @@ import Utils from "../../../utils";
 import Validate from "../../../validate";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
+import S3 from "../../../storage/s3storage";
 
 export default async function handleFileUpload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if(req.method !== 'POST') return Utils.jsonResponse(Errors.getJson(404));
-
-	const contentLength = req.headers.get('Content-Length');
-	if(contentLength && parseInt(contentLength, 10) > 53_687_091_200) {
-    return Utils.jsonResponse(Errors.getJson(1010));
-  }
 
 	const auth = Utils.basicAuthentication(req);
 	if(auth === null) return Utils.jsonResponse(Errors.getJson(1018));
@@ -23,6 +18,36 @@ export default async function handleFileUpload(req: Request, match: MatchedRoute
 	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
 	if(!Validate.token(token)) return Utils.jsonResponse(Errors.getJson(1017));
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
+
+	if(req.method === 'POST' && process.env.S3_ENABLED === 'true'){
+		return await s3FileUpload(req, auth.user);
+	}else if(req.method === 'PUT' && process.env.S3_ENABLED !== 'true'){
+		return await localFileUpload(req, auth.user);
+	}else{
+		return Utils.jsonResponse(Errors.getJson(404));
+	}
+}
+
+async function s3FileUpload(req: Request, username: string): Promise<Response>{
+	let data: any;
+	try{
+		data = await req.json();
+	}catch{
+		return Utils.jsonResponse(Errors.getJson(1001));
+	}
+
+	if(!Validate.userFilePathName(data.path)) return Utils.jsonResponse(Errors.getJson(1005));
+
+	let res = await S3.getUserMultipartUploadLink(username, data.path);
+	if(res === null) return Utils.jsonResponse(Errors.getJson(2000));
+	return Utils.jsonResponse({ 'error': 0, 'info': 'Success', 'link': res });
+}
+
+async function localFileUpload(req: Request, username: string): Promise<Response>{
+	const contentLength = req.headers.get('Content-Length');
+	if(contentLength && parseInt(contentLength, 10) > 53_687_091_200) {
+    return Utils.jsonResponse(Errors.getJson(1010));
+  }
 
 	const formdata = await req.formData();
 	const key = formdata.get('name')?.toString();
@@ -41,10 +66,10 @@ export default async function handleFileUpload(req: Request, match: MatchedRoute
 		return Utils.jsonResponse(Errors.getJson(1010));
 	}
 
-	let res = await Storage.uploadUserFile(auth.user, key!, file);
+	let res = await Storage.uploadUserFile(username, key!, file);
 	if(res === null) return Utils.jsonResponse(Errors.getJson(2000));
 
-	await Redis.deleteString(`filelist_${auth.user}`);
+	await Redis.deleteString(`filelist_${username}`);
 
 	return Utils.jsonResponse({ 'error': 0, 'info': 'Success' });
 }
