@@ -47,4 +47,15 @@ export default class Validate{
 		return true;
 	}
 
+	static chunks(chunks: any): boolean{
+		if(!Array.isArray(chunks)) return false;
+		for(let i = 0; i < chunks.length; i++){
+			if(!Validate.token(chunks[i].hash)) return false;
+			if(typeof chunks[i].number !== 'number') return false;
+			if(chunks[i].number > chunks.length) return false;
+			if(chunks[i].number <= 0) return false;
+		}
+		return true;
+	}
+
 }
