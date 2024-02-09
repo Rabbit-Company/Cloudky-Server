@@ -7,7 +7,8 @@ import {
 	CreateMultipartUploadCommand,
 	UploadPartCommand,
 	CompleteMultipartUploadCommand,
-	PutObjectCommand
+	PutObjectCommand,
+	DeleteObjectsCommand
 } from "@aws-sdk/client-s3";
 import type { FileInformation } from './storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -32,11 +33,27 @@ export default class S3{
 				StartAfter: startAfter
 			}));
 
-			if(res.Contents === undefined) return false;
+			if(!res.Contents) return false;
 			return res.Contents;
 		}catch(err){
 			Logger.error(`[S3] ${err}`);
 			return null;
+		}
+	}
+
+	static async deleteObjects(keys: string[]): Promise<boolean>{
+		try{
+			let res = await this.S3.send(new DeleteObjectsCommand({
+				Bucket: process.env.S3_BUCKET_NAME,
+				Delete: {
+					Objects: keys.map((key) => { return {Key: key }; })
+				}
+			}));
+			if(!res.Deleted) return false;
+			return true;
+		}catch(err){
+			Logger.error(`[S3] ${err}`);
+			return false;
 		}
 	}
 
@@ -144,6 +161,10 @@ export default class S3{
 		);
 
     return ufiles;
+	}
+
+	static async deleteUserFiles(username: string, keys: string[]): Promise<boolean>{
+		return await this.deleteObjects(keys.map(key => `data/${username}/${key}`));
 	}
 
 	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{

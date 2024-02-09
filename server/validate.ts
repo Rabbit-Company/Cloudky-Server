@@ -31,6 +31,16 @@ export default class Validate{
 		return /^[a-zA-Z0-9\/_. -]+$/.test(filePathName);
 	}
 
+	static userFilePathNames(filePathNames: string[] | null | undefined): boolean{
+		if(!Array.isArray(filePathNames)) return false;
+		if(filePathNames.length === 0) return false;
+		for(let i = 0; i < filePathNames.length; i++){
+			if(filePathNames[i].includes('..')) return false;
+			if(!(/^[a-zA-Z0-9\/_. -]+$/.test(filePathNames[i]))) return false;
+		}
+		return true;
+	}
+
 	static accountType(accountType: string | number | null | undefined): boolean{
 		if(typeof(accountType) !== 'string' && typeof(accountType) !== 'number') return false;
 		if(![0, 1].includes(Number(accountType))) return false;

@@ -1,10 +1,10 @@
 import { Glob } from "bun";
-import { readdir } from "node:fs/promises";
 import {
 	type _Object
 } from "@aws-sdk/client-s3";
 import type { FileInformation } from './storage';
 import type { BunFile } from 'bun';
+import { unlink } from 'fs/promises';
 
 export default class LocalStorage{
 
@@ -45,6 +45,18 @@ export default class LocalStorage{
 			return file;
 		}catch{
 			return null;
+		}
+	}
+
+	static async deleteUserFiles(username: string, keys: string[]): Promise<boolean>{
+		try{
+			keys.forEach(async key => {
+				let path = `${process.env.DATA_DIRECTORY}/data/${username}/${key}`;
+				if(await Bun.file(path).exists()) await unlink(path);
+			});
+			return true;
+		}catch{
+			return false;
 		}
 	}
 }

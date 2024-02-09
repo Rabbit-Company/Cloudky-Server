@@ -43,6 +43,17 @@ export default class Redis{
 		}
 	}
 
+	static async deleteString(key: string): Promise<boolean | null>{
+		try{
+			await Redis.localCache.del(key);
+			await Redis.externalCache.del(key);
+			return true;
+		}catch{
+			Logger.error('[REDIS] Connection error!');
+			return null;
+		}
+	}
+
 	static async getOrSetString(key: string, value: string, localTTL: number = 0, externalTTL: number = 0): Promise<string | null>{
 		try{
 			if(localTTL !== 0){

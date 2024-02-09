@@ -1,4 +1,3 @@
-import Logger from '@rabbit-company/logger';
 import {
 	type _Object
 } from "@aws-sdk/client-s3";
@@ -18,6 +17,13 @@ export default class Storage{
 			return await S3.listUserFiles(username);
 		}
 		return await LocalStorage.listUserFiles(username);
+	}
+
+	static async deleteUserFiles(username: string, keys: string[]){
+		if(process.env.S3_ENABLED === 'true'){
+			return await S3.deleteUserFiles(username, keys);
+		}
+		return await LocalStorage.deleteUserFiles(username, keys);
 	}
 
 	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{
