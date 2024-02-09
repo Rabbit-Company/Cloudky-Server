@@ -5,6 +5,7 @@ import Redis from './database/redis.ts';
 import DB from './database/database.ts';
 import Validate from './validate.ts';
 import Blake2b from '@rabbit-company/blake2b';
+import { saveChunk, type ChunkData, buildChunks } from './chunks.ts';
 
 await Redis.initialize();
 await DB.initialize();
@@ -48,19 +49,10 @@ Bun.serve({
 
 if(process.env.S3_ENABLED !== 'true'){
 
-	interface Chunk{
-		number: number,
-		hash: string
-	}
-
 	type WebSocketData = {
 		username: string;
 		token: string;
-		uploadID: string;
-		path: string;
-		chunks: Chunk[];
-		completed: Chunk[];
-		created: number;
+		chunkData: ChunkData
 	};
 
 	Logger.info(`WebSocket listening on port ${process.env.SERVER_HOSTNAME}:${process.env.WEBSOCKET_PORT}`);
@@ -90,14 +82,19 @@ if(process.env.S3_ENABLED !== 'true'){
 			if(!Validate.token(token2)) return Utils.jsonResponse(Errors.getJson(1017));
 			if(token !== token2) return Utils.jsonResponse(Errors.getJson(1017));
 
-			let data: WebSocketData = {
-				username: username as string,
-				token: token as string,
+			let chunkData: ChunkData = {
+				owner: username as string,
 				uploadID: uploadID as string,
 				path: path as string,
 				chunks: [],
-				completed: [],
+				completed: new Set(),
 				created: Date.now()
+			}
+
+			let data: WebSocketData = {
+				username: username as string,
+				token: token as string,
+				chunkData: chunkData
 			}
 
 			if(server.upgrade(req, { data })) return;
@@ -117,25 +114,15 @@ if(process.env.S3_ENABLED !== 'true'){
 							ws.send(JSON.stringify(Utils.jsonResponse(Errors.getJson(1001))));
 							return;
 						}
-						ws.data.chunks = data.chunks;
-						ws.send(JSON.stringify({ error: '6000', info: 'Chucks successfully saved' }));
+						ws.data.chunkData.chunks = data.chunks;
 					}catch{
 						ws.send(JSON.stringify(Utils.jsonResponse(Errors.getJson(1001))));
 					}
 					return;
 				}
 
-				let hash = Blake2b.hash(message, '');
-				try{
-					if(ws.data.chunks.some(chunk => chunk.hash === hash)){
-						await Bun.write(`${process.env.DATA_DIRECTORY}/tmp/${ws.data.username}/${ws.data.uploadID}/${hash}`, message, { createPath: true });
-						ws.send(JSON.stringify({ error: '5000', info: 'Chuck successfully uploaded', chunk: hash }));
-					}else{
-						ws.send(JSON.stringify({ error: '5001', info: 'Received chunk does not exists', chunk: hash }));
-					}
-				}catch{
-					ws.send(JSON.stringify({ error: '5002', info: 'Error while processing chunk', chunk: hash }));
-				}
+				await saveChunk(ws.data.chunkData, message);
+				await buildChunks(ws.data.chunkData);
 			}
 		}
 	});
