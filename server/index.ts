@@ -112,8 +112,8 @@ if(process.env.S3_ENABLED !== 'true'){
 						let data = JSON.parse(message);
 						if(!Validate.chunks(data.chunks)) return;
 						ws.data.chunkData.chunks = data.chunks;
-						ws.sendText(JSON.stringify({ chunks: ws.data.chunkData.chunks, completed: Array.from(ws.data.chunkData.completed), size: ws.data.chunkData.size }));
 					}catch{}
+					ws.sendText(JSON.stringify({ chunks: ws.data.chunkData.chunks, completed: Array.from(ws.data.chunkData.completed), size: ws.data.chunkData.size }));
 					return;
 				}
 
