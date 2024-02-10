@@ -7,6 +7,7 @@ export interface ChunkData{
 	path: string;
 	chunks: string[];
 	completed: Set<string>;
+	size: number;
 	created: number;
 }
 
@@ -18,6 +19,7 @@ export async function saveChunk(chunkData: ChunkData, data: Buffer): Promise<boo
 	const targetPath = `${process.env.DATA_DIRECTORY}/tmp/${chunkData.owner}/${chunkData.uploadID}/${hash}`;
 	try{
 		await Bun.write(targetPath, data, { createPath: true });
+		chunkData.size += data.length;
 	}catch(err){
 		Logger.error('[CHUNK] Saving');
 		return false;

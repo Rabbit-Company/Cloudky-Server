@@ -4,7 +4,6 @@ import Logger from '@rabbit-company/logger';
 import Redis from './database/redis.ts';
 import DB from './database/database.ts';
 import Validate from './validate.ts';
-import Blake2b from '@rabbit-company/blake2b';
 import { saveChunk, type ChunkData, buildChunks } from './chunks.ts';
 
 await Redis.initialize();
@@ -88,6 +87,7 @@ if(process.env.S3_ENABLED !== 'true'){
 				path: path as string,
 				chunks: [],
 				completed: new Set(),
+				size: 0,
 				created: Date.now()
 			}
 
@@ -103,26 +103,23 @@ if(process.env.S3_ENABLED !== 'true'){
 		},
 		websocket: {
 			idleTimeout: 120,
-			maxPayloadLength: 1024 * 1024 * 100,
+			maxPayloadLength: 1024 * 1024 * 50,
 			sendPings: true,
 			publishToSelf: false,
 			async message(ws, message){
 				if(typeof message === 'string'){
 					try{
 						let data = JSON.parse(message);
-						if(!Validate.chunks(data.chunks)){
-							ws.send(JSON.stringify(Utils.jsonResponse(Errors.getJson(1001))));
-							return;
-						}
+						if(!Validate.chunks(data.chunks)) return;
 						ws.data.chunkData.chunks = data.chunks;
-					}catch{
-						ws.send(JSON.stringify(Utils.jsonResponse(Errors.getJson(1001))));
-					}
+						ws.sendText(JSON.stringify({ chunks: ws.data.chunkData.chunks, completed: Array.from(ws.data.chunkData.completed), size: ws.data.chunkData.size }));
+					}catch{}
 					return;
 				}
 
 				await saveChunk(ws.data.chunkData, message);
 				await buildChunks(ws.data.chunkData);
+				ws.sendText(JSON.stringify({ chunks: ws.data.chunkData.chunks, completed: Array.from(ws.data.chunkData.completed), size: ws.data.chunkData.size }));
 			}
 		}
 	});
