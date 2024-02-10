@@ -6,7 +6,7 @@ import Validate from "../../../validate";
 import DB from "../../../database/database";
 
 export default async function handleAccountToken(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if(req.method !== 'GET') return Utils.jsonResponse(Errors.getJson(404));
+	if(req.method !== 'POST') return Utils.jsonResponse(Errors.getJson(404));
 
 	const auth = Utils.basicAuthentication(req);
 	if(auth === null) return Utils.jsonResponse(Errors.getJson(1011));

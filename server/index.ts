@@ -29,6 +29,16 @@ Bun.serve({
 
 		Logger.http(`${req.method} - ${ip} - ${path}`);
 
+		if(req.method === 'OPTIONS'){
+			let response = new Response();
+			response.headers.set('Access-Control-Allow-Origin', '*');
+			response.headers.set('Access-Control-Allow-Headers', '*');
+			response.headers.set('Access-Control-Allow-Credentials', 'true');
+			response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+			response.headers.set('Access-Control-Max-Age', '86400');
+			return response;
+		}
+
 		// TODO: API rate limiter
 
 		const match = router.match(path);
