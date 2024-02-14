@@ -9,7 +9,8 @@ export default class D1{
 	});
 
 	static async initialize(){
-		let res = await DB.prepareModify(`
+		const resPromises = [
+			DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
 				"Username" TEXT PRIMARY KEY,
 				"Email" TEXT NOT NULL,
@@ -23,9 +24,8 @@ export default class D1{
 				"Created" INTEGER NOT NULL,
 				"Accessed" INTEGER NOT NULL
 			);
-		`, []);
-
-		let res2 = await DB.prepareModify(`
+		`, []),
+		DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "ShareLinks"(
 				"Token" TEXT NOT NULL PRIMARY KEY,
 				"Path" TEXT NOT NULL,
@@ -36,15 +36,16 @@ export default class D1{
 				"Created" INTEGER NOT NULL,
 				"Accessed" INTEGER NOT NULL
 			);
-		`, []);
-
-		let res3 = await DB.prepareModify(`
+		`, []),
+		DB.prepareModify(`
 			CREATE INDEX IF NOT EXISTS idx_expiration ON "ShareLinks" ("Expiration");
-		`, []);
-
-		let res4 = await DB.prepareModify(`
+		`, []),
+		DB.prepareModify(`
 			CREATE INDEX IF NOT EXISTS idx_path_username ON "ShareLinks" ("Path", "Username");
-		`, []);
+		`, [])
+		]
+
+		const [res, res2, res3, res4] = await Promise.all(resPromises);
 
 		if(!res || !res2 || !res3 || !res4) process.exit();
 	}
