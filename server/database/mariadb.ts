@@ -1,4 +1,3 @@
-import Logger from '@rabbit-company/logger';
 import mariadb from 'mariadb';
 import DB from './database';
 
@@ -45,6 +44,6 @@ export default class MariaDB{
 			);
 	`, []);
 
-		if(res === null) process.exit();
+		if(!res) process.exit();
 	}
 }

@@ -1,4 +1,3 @@
-import Logger from '@rabbit-company/logger';
 import mysql, { type Pool } from 'mysql2/promise';
 import DB from './database';
 
@@ -48,6 +47,6 @@ export default class MySQL{
 			);
 	`, []);
 
-		if(res === null) process.exit();
+		if(!res) process.exit();
 	}
 }

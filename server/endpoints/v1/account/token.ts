@@ -25,6 +25,9 @@ export default async function handleAccountToken(req: Request, match: MatchedRou
 	let token = await Redis.getOrSetString(`token_${auth.user}_${hashedIP}`, newToken, 60, 3600);
 	if(token === null) return Utils.jsonResponse(Errors.getJson(1015));
 
+	let timestamp = Math.floor(Date.now() / 1000);
+	await DB.prepare('UPDATE "Accounts" SET "Accessed" = ? WHERE "Username" = ?', [timestamp, auth.user]);
+
 	let json = Errors.getJson(0) as { error: number; info: string; token?: string };
 	json.token = token;
 
