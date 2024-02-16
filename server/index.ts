@@ -6,12 +6,13 @@ import DB from './database/database.ts';
 import Scheduler from './scheduler.ts';
 import Validate from './validate.ts';
 import { saveChunk, type ChunkData, buildChunks } from './chunks.ts';
+import Metrics from './metrics.ts';
 
 await Redis.initialize();
 await DB.initialize();
 await Scheduler.initialize();
 
-Logger.level = Number(process.env.LOGGER_LEVEL) || 6;
+Logger.level = Number(process.env.LOGGER_LEVEL) || 3;
 
 Logger.info(`Server listening on port ${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}`);
 
@@ -32,7 +33,7 @@ Bun.serve({
 		Logger.http(`${req.method} - ${ip} - ${path}`);
 
 		if(Number(process.env.METRICS_TYPE) >= 1){
-			await Redis.increase('metrics_web_request_counter');
+			Metrics.http_requests_total.labels(req.method, path).inc();
 		}
 
 		if(req.method === 'OPTIONS'){

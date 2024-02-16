@@ -5,6 +5,7 @@ import Validate from "../../../validate";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
 import S3 from "../../../storage/s3storage";
+import Metrics from "../../../metrics";
 
 export default async function handleFileUpload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 
@@ -18,6 +19,10 @@ export default async function handleFileUpload(req: Request, match: MatchedRoute
 	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
 	if(!Validate.token(token)) return Utils.jsonResponse(Errors.getJson(1017));
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
+
+	if(Number(process.env.METRICS_TYPE) >= 2){
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
+	}
 
 	if(req.method === 'POST' && process.env.S3_ENABLED === 'true'){
 		return await s3FileUpload(req, auth.user);

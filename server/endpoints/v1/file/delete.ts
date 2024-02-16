@@ -4,6 +4,7 @@ import Utils from "../../../utils";
 import Validate from "../../../validate";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
+import Metrics from "../../../metrics";
 
 export default async function handleFileDelete(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'POST') return Utils.jsonResponse(Errors.getJson(404));
@@ -26,6 +27,10 @@ export default async function handleFileDelete(req: Request, match: MatchedRoute
 	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
 	if(!Validate.token(token)) return Utils.jsonResponse(Errors.getJson(1017));
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
+
+	if(Number(process.env.METRICS_TYPE) >= 2){
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
+	}
 
 	let res = await Storage.deleteUserFiles(auth.user, data.paths);
 	if(res === false) return Utils.jsonResponse(Errors.getJson(2000));

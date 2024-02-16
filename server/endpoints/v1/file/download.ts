@@ -5,6 +5,7 @@ import Validate from "../../../validate";
 import Redis from "../../../database/redis";
 import S3 from "../../../storage/s3storage";
 import LocalStorage from "../../../storage/localstorage";
+import Metrics from "../../../metrics";
 
 export default async function handleFileDownload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'POST') return Utils.jsonResponse(Errors.getJson(404));
@@ -27,6 +28,10 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
 	if(!Validate.token(token)) return Utils.jsonResponse(Errors.getJson(1017));
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
+
+	if(Number(process.env.METRICS_TYPE) >= 2){
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
+	}
 
 	if(process.env.S3_ENABLED === 'true'){
 		let res = await S3.getUserObjectLink(auth.user, data.path);

@@ -5,6 +5,7 @@ import Validate from "../../../validate";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
 import DB from "../../../database/database";
+import Metrics from "../../../metrics";
 
 export default async function handleFileList(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'GET') return Utils.jsonResponse(Errors.getJson(404));
@@ -19,6 +20,10 @@ export default async function handleFileList(req: Request, match: MatchedRoute |
 	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
 	if(!Validate.token(token)) return Utils.jsonResponse(Errors.getJson(1017));
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
+
+	if(Number(process.env.METRICS_TYPE) >= 2){
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
+	}
 
 	let fromCache = false;
 	let result: any = await Redis.getString(`filelist_${auth.user}`, 60);
