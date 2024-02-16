@@ -32,7 +32,7 @@ Bun.serve({
 		Logger.http(`${req.method} - ${ip} - ${path}`);
 
 		if(Number(process.env.METRICS_TYPE) >= 1){
-			await Redis.increase('metrics_http_requests_total');
+			await Redis.increase('metrics_web_request_counter');
 		}
 
 		if(req.method === 'OPTIONS'){
