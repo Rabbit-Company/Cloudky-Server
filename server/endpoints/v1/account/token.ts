@@ -26,7 +26,7 @@ export default async function handleAccountToken(req: Request, match: MatchedRou
 	let token = await Redis.getOrSetString(`token_${auth.user}_${hashedIP}`, newToken, 60, 3600);
 	if(token === null) return Utils.jsonResponse(Errors.getJson(1015));
 
-	if(Number(process.env.METRICS_TYPE) >= 2){
+	if(Number(process.env.METRICS_TYPE) >= 3){
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
 	}
 

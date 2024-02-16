@@ -21,7 +21,7 @@ const router = new Bun.FileSystemRouter({
 	dir: './server/endpoints'
 });
 
-Bun.serve({
+export const httpServer = Bun.serve({
 	port: process.env.SERVER_PORT,
 	hostname: process.env.SERVER_HOSTNAME,
 	development: false,
@@ -48,6 +48,7 @@ Bun.serve({
 
 		// TODO: API rate limiter
 
+		const start = process.hrtime();
 		const match = router.match(path);
 		if(!match) return Utils.jsonResponse(Errors.getJson(404), 404);
 
@@ -55,7 +56,14 @@ Bun.serve({
 
 		try{
 			const module = await import('./endpoints/' + src);
-			return await module.default(req, match, ip);
+			const res = await module.default(req, match, ip);
+
+			const end = process.hrtime(start);
+			if(Number(process.env.METRICS_TYPE) >= 2){
+				Metrics.http_request_duration.labels(path).observe(end[0] * 1000 + end[1] / 1000000);
+			}
+
+			return res;
 		}catch(err){
 			Logger.error(`[GENERAL] ${err}`);
 			return Utils.jsonResponse(Errors.getJson(2000), 500);

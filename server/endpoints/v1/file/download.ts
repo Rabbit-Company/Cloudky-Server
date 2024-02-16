@@ -29,7 +29,7 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	if(!Validate.token(token)) return Utils.jsonResponse(Errors.getJson(1017));
 	if(auth.pass !== token) return Utils.jsonResponse(Errors.getJson(1017));
 
-	if(Number(process.env.METRICS_TYPE) >= 2){
+	if(Number(process.env.METRICS_TYPE) >= 3){
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
 	}
 
