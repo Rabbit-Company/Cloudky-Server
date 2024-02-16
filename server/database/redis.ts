@@ -43,6 +43,24 @@ export default class Redis{
 		}
 	}
 
+	static async increase(key: string, local: boolean = true, external: boolean = false): Promise<number | null>{
+		try{
+			let number = 0;
+
+			if(local) number = await Redis.localCache.incr(key);
+			if(external) number = await Redis.externalCache.incr(key);
+
+			return number;
+		}catch{
+			Logger.error('[REDIS] Connection error!');
+			return null;
+		}
+	}
+
+	static async getNumber(key: string, defaultNumber: number = 0): Promise<number>{
+		return Number.parseInt(await Redis.getString(key) || defaultNumber.toString(), 10) || defaultNumber;
+	}
+
 	static async deleteString(key: string): Promise<boolean | null>{
 		try{
 			await Redis.localCache.del(key);

@@ -3,11 +3,13 @@ import Errors from './errors.ts';
 import Logger from '@rabbit-company/logger';
 import Redis from './database/redis.ts';
 import DB from './database/database.ts';
+import Scheduler from './scheduler.ts';
 import Validate from './validate.ts';
 import { saveChunk, type ChunkData, buildChunks } from './chunks.ts';
 
 await Redis.initialize();
 await DB.initialize();
+await Scheduler.initialize();
 
 Logger.level = Number(process.env.LOGGER_LEVEL) || 6;
 
@@ -28,6 +30,10 @@ Bun.serve({
 		const ip = server.requestIP(req)?.address;
 
 		Logger.http(`${req.method} - ${ip} - ${path}`);
+
+		if(Number(process.env.METRICS_TYPE) >= 1){
+			await Redis.increase('metrics_http_requests_total');
+		}
 
 		if(req.method === 'OPTIONS'){
 			let response = new Response();
