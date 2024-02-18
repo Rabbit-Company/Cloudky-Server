@@ -23,7 +23,10 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 	if(results === null) return Utils.jsonResponse(Errors.getJson(2000));
 	if(results.length !== 0) return Utils.jsonResponse(Errors.getJson(1007));
 
-	data.password = await Bun.password.hash(data.password);
+	data.password = await Bun.password.hash(data.password, {
+		algorithm: 'bcrypt',
+		cost: 10
+	});
 
 	let timestamp = Math.floor(Date.now() / 1000);
 	let result = await DB.prepareModify('INSERT INTO "Accounts"("Username","Email","Password","StorageUsed","StorageLimit","Type","Created","Accessed") VALUES(?,?,?,?,?,?,?,?)', [data.username, data.email, data.password, 0, Number(process.env.ACCOUNT_STORAGE_LIMIT), Number(data.type), timestamp, timestamp]);
