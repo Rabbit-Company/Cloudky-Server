@@ -24,8 +24,9 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 	if(results.length !== 0) return Utils.jsonResponse(Errors.getJson(1007));
 
 	data.password = await Bun.password.hash(data.password, {
-		algorithm: 'bcrypt',
-		cost: 10
+		algorithm: 'argon2id',
+		memoryCost: 64*1024,
+		timeCost: 1
 	});
 
 	let timestamp = Math.floor(Date.now() / 1000);
