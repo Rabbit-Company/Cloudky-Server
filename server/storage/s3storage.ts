@@ -155,7 +155,7 @@ export default class S3{
 			.filter(file => file.Key !== undefined && file.Size !== undefined && file.LastModified !== undefined)
 			.map(({ Key, LastModified, Size }) => ({
 				Key: Key!.replace(`data/${username}/`, ''),
-				LastModified: LastModified!.toISOString(),
+				Modified: new Date(LastModified!).getTime(),
 				Size: Size!
 			})
 		);

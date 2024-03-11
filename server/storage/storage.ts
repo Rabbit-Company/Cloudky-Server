@@ -6,7 +6,7 @@ import LocalStorage from './localstorage';
 
 export interface FileInformation {
   Key: string;
-  LastModified: string;
+	Modified: number;
   Size: number;
 }
 

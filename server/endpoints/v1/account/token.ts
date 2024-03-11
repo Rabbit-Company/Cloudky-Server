@@ -30,7 +30,7 @@ export default async function handleAccountToken(req: Request, match: MatchedRou
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
 	}
 
-	let timestamp = Math.floor(Date.now() / 1000);
+	let timestamp = Date.now();
 	await DB.prepare('UPDATE "Accounts" SET "Accessed" = ? WHERE "Username" = ?', [timestamp, auth.user]);
 
 	let json = Errors.getJson(0) as { error: number; info: string; token?: string };

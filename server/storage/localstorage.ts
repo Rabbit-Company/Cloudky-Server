@@ -18,7 +18,7 @@ export default class LocalStorage{
 				let file = Bun.file(`${path}/${fileName}`);
 				files.push({
 					Key: fileName,
-					LastModified: new Date(file.lastModified).toISOString(),
+					Modified: file.lastModified,
 					Size: file.size
 				});
 			}

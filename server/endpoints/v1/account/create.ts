@@ -29,7 +29,7 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 		timeCost: 1
 	});
 
-	let timestamp = Math.floor(Date.now() / 1000);
+	let timestamp = Date.now();
 	let result = await DB.prepareModify('INSERT INTO "Accounts"("Username","Email","Password","StorageUsed","StorageLimit","Type","Created","Accessed") VALUES(?,?,?,?,?,?,?,?)', [data.username, data.email, data.password, 0, Number(process.env.ACCOUNT_STORAGE_LIMIT), Number(data.type), timestamp, timestamp]);
 	if(!result) return Utils.jsonResponse(Errors.getJson(2000));
 
