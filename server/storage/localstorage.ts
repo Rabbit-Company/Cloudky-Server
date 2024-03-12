@@ -4,7 +4,8 @@ import {
 } from "@aws-sdk/client-s3";
 import type { FileInformation } from './storage';
 import type { BunFile } from 'bun';
-import { unlink } from 'fs/promises';
+import { mkdir, unlink, rename } from 'fs/promises';
+import path from 'node:path';
 
 export default class LocalStorage{
 
@@ -45,6 +46,20 @@ export default class LocalStorage{
 			return file;
 		}catch{
 			return null;
+		}
+	}
+
+	static async moveUserFiles(username: string, keys: string[], destination: string): Promise<boolean>{
+		try{
+			destination = `${process.env.DATA_DIRECTORY}/data/${username}/${destination}`;
+			await mkdir(destination, { recursive: true });
+			for(let i = 0; i < keys.length; i++){
+				let file = `${process.env.DATA_DIRECTORY}/data/${username}/${keys[i]}`;
+				await rename(file, `${destination}/${path.basename(file)}`);
+			}
+			return true;
+		}catch{
+			return false;
 		}
 	}
 

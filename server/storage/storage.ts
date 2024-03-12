@@ -19,6 +19,13 @@ export default class Storage{
 		return await LocalStorage.listUserFiles(username);
 	}
 
+	static async moveUserFiles(username: string, keys: string[], destination: string){
+		if(process.env.S3_ENABLED === 'true'){
+			return false;
+		}
+		return await LocalStorage.moveUserFiles(username, keys, destination);
+	}
+
 	static async deleteUserFiles(username: string, keys: string[]){
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.deleteUserFiles(username, keys);
