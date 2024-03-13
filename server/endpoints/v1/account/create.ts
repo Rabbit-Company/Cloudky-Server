@@ -30,7 +30,7 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 	});
 
 	let timestamp = Date.now();
-	let result = await DB.prepareModify('INSERT INTO "Accounts"("Username","Email","Password","StorageUsed","StorageLimit","TransferUsed","TransferLimit","Type","Created","Accessed") VALUES(?,?,?,?,?,?,?,?,?,?)', [data.username, data.email, data.password, 0, Number(process.env.ACCOUNT_STORAGE_LIMIT), 0, Number(process.env.ACCOUNT_TRANSFER_LIMIT), Number(data.type), timestamp, timestamp]);
+	let result = await DB.prepareModify('INSERT INTO "Accounts"("Username","Email","Password","StorageUsed","StorageLimit","DownloadUsed","DownloadLimit","UploadUsed","UploadLimit","Type","Created","Accessed") VALUES(?,?,?,?,?,?,?,?,?,?,?,?)', [data.username, data.email, data.password, 0, Number(process.env.ACCOUNT_STORAGE_LIMIT), 0, Number(process.env.ACCOUNT_DOWNLOAD_LIMIT), 0, Number(process.env.ACCOUNT_UPLOAD_LIMIT), Number(data.type), timestamp, timestamp]);
 	if(!result) return Utils.jsonResponse(Errors.getJson(2000));
 
 	return Utils.jsonResponse(Errors.getJson(0));

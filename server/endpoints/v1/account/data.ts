@@ -24,7 +24,7 @@ export default async function handleAccountData(req: Request, match: MatchedRout
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
 	}
 
-	let result: any = await DB.prepare(`SELECT "Email","StorageUsed","StorageLimit","TransferUsed","TransferLimit","Type" AS "AccountType","Created" FROM "Accounts" WHERE "Username" = ?`, [auth.user]);
+	let result: any = await DB.prepare(`SELECT "Email","StorageUsed","StorageLimit","DownloadUsed","DownloadLimit","UploadUsed","UploadLimit","Type" AS "AccountType","Created" FROM "Accounts" WHERE "Username" = ?`, [auth.user]);
 	if(result === null || result.length !== 1) return Utils.jsonResponse(Errors.getJson(2000));
 
 	result[0].StorageType = (process.env.S3_ENABLED === 'true') ? 'S3' : 'LOCAL';

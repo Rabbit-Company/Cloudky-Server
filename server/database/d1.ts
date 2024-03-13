@@ -20,8 +20,10 @@ export default class D1{
 				"BackupCodes" TEXT,
 				"StorageUsed" INTEGER NOT NULL,
 				"StorageLimit" INTEGER NOT NULL,
-				"TransferUsed" INTEGER NOT NULL,
-				"TransferLimit" INTEGER NOT NULL,
+				"DownloadUsed" INTEGER NOT NULL,
+				"DownloadLimit" INTEGER NOT NULL,
+				"UploadUsed" INTEGER NOT NULL,
+				"UploadLimit" INTEGER NOT NULL,
 				"Type" INTEGER NOT NULL,
 				"Created" INTEGER NOT NULL,
 				"Accessed" INTEGER NOT NULL
