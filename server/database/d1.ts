@@ -30,6 +30,13 @@ export default class D1{
 			);
 		`, []),
 		DB.prepareModify(`
+			CREATE TABLE IF NOT EXISTS "Files"(
+				"UUID" TEXT PRIMARY KEY,
+				"Path" TEXT NOT NULL,
+				"Username" TEXT NOT NULL
+			);
+		`, []),
+		DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "ShareLinks"(
 				"Token" TEXT NOT NULL PRIMARY KEY,
 				"Path" TEXT NOT NULL,
@@ -46,6 +53,9 @@ export default class D1{
 		`, []),
 		DB.prepareModify(`
 			CREATE INDEX IF NOT EXISTS idx_path_username ON "ShareLinks" ("Path", "Username");
+		`, []),
+		DB.prepareModify(`
+			CREATE UNIQUE INDEX IF NOT EXISTS idx_path_username ON "Files" ("Path", "Username");
 		`, [])
 		]
 

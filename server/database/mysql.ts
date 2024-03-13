@@ -20,7 +20,7 @@ export default class MySQL{
 	static async initialize(){
 		let res = await DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
-				"Username" VARCHAR(30) NOT NULL PRIMARY KEY,
+				"Username" VARCHAR(30) PRIMARY KEY,
 				"Email" VARCHAR(255) NOT NULL,
 				"Password" VARCHAR(255) NOT NULL,
 				"2faSecret" VARCHAR(20),
@@ -37,8 +37,15 @@ export default class MySQL{
 				"Accessed" BIGINT NOT NULL
 			);
 
+			CREATE TABLE IF NOT EXISTS "Files"(
+				"UUID" VARCHAR(36) PRIMARY KEY,
+				"Path" VARCHAR(4096) NOT NULL,
+				"Username" VARCHAR(30) NOT NULL,
+				UNIQUE idx_path_username ("Path", "Username")
+			);
+
 			CREATE TABLE IF NOT EXISTS "ShareLinks"(
-				"Token" VARCHAR(15) NOT NULL PRIMARY KEY,
+				"Token" VARCHAR(15) PRIMARY KEY,
 				"Path" VARCHAR(4096) NOT NULL,
 				"Username" VARCHAR(30) NOT NULL,
 				"Password" VARCHAR(255),

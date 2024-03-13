@@ -24,8 +24,14 @@ export default class SQLite{
 				"Accessed" INTEGER NOT NULL
 			);
 
+			CREATE TABLE IF NOT EXISTS "Files"(
+				"UUID" TEXT PRIMARY KEY,
+				"Path" TEXT NOT NULL,
+				"Username" TEXT NOT NULL
+			);
+
 			CREATE TABLE IF NOT EXISTS "ShareLinks"(
-				"Token" TEXT NOT NULL PRIMARY KEY,
+				"Token" TEXT PRIMARY KEY,
 				"Path" TEXT NOT NULL,
 				"Username" TEXT NOT NULL,
 				"Password" TEXT,
@@ -37,6 +43,8 @@ export default class SQLite{
 
 			CREATE INDEX IF NOT EXISTS idx_expiration ON "ShareLinks" ("Expiration");
 			CREATE INDEX IF NOT EXISTS idx_path_username ON "ShareLinks" ("Path", "Username");
+
+			CREATE UNIQUE INDEX IF NOT EXISTS idx_path_username ON "Files" ("Path", "Username");
 		`);
 	}
 }
