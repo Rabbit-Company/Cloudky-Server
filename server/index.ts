@@ -63,6 +63,12 @@ export const httpServer = Bun.serve({
 				Metrics.http_request_duration.labels(path).observe(end[0] * 1000 + end[1] / 1000000);
 			}
 
+			res.headers.set('Access-Control-Allow-Origin', '*');
+			res.headers.set('Access-Control-Allow-Headers', '*');
+			res.headers.set('Access-Control-Allow-Credentials', 'true');
+			res.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+			res.headers.set('Access-Control-Max-Age', '86400');
+
 			return res;
 		}catch(err){
 			Logger.error(`[GENERAL] ${err}`);

@@ -42,5 +42,10 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	let res = await LocalStorage.downloadUserFile(auth.user, data.path);
 	if(res === null) return Utils.jsonResponse(Errors.getJson(2000));
 
-	return new Response(res);
+	const parts = data.path.split('/');
+	const fileName = parts[parts.length - 1];
+
+	const response = new Response(res);
+	response.headers.set('Content-Disposition', `attachment; filename="${fileName}"`);
+	return response;
 }
