@@ -27,7 +27,9 @@ export default class SQLite{
 			CREATE TABLE IF NOT EXISTS "Files"(
 				"UUID" TEXT PRIMARY KEY,
 				"Path" TEXT NOT NULL,
-				"Username" TEXT NOT NULL
+				"Username" TEXT NOT NULL,
+				"Size" INTEGER,
+				"Modified" INTEGER
 			);
 
 			CREATE TABLE IF NOT EXISTS "ShareLinks"(

@@ -38,6 +38,8 @@ export default class MariaDB{
 				"UUID" VARCHAR(36) PRIMARY KEY,
 				"Path" VARCHAR(4096) NOT NULL,
 				"Username" VARCHAR(30) NOT NULL,
+				"Size" BIGINT,
+				"Modified" BIGINT,
 				UNIQUE idx_path_username ("Path", "Username")
 			);
 

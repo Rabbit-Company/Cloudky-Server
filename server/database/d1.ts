@@ -33,7 +33,9 @@ export default class D1{
 			CREATE TABLE IF NOT EXISTS "Files"(
 				"UUID" TEXT PRIMARY KEY,
 				"Path" TEXT NOT NULL,
-				"Username" TEXT NOT NULL
+				"Username" TEXT NOT NULL,
+				"Size" INTEGER,
+				"Modified" INTEGER
 			);
 		`, []),
 		DB.prepareModify(`
