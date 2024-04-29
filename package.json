@@ -32,8 +32,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.563.0",
-    "@aws-sdk/s3-request-presigner": "^3.563.0",
+    "@aws-sdk/client-s3": "^3.564.0",
+    "@aws-sdk/s3-request-presigner": "^3.564.0",
     "@rabbit-company/blake2b": "^2.0.0",
     "@rabbit-company/logger": "^3.1.0",
     "d1-api": "^0.1.0",
