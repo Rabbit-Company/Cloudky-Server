@@ -12,6 +12,8 @@ await Redis.initialize();
 await DB.initialize();
 await Scheduler.initialize();
 
+Metrics.initialize();
+
 Logger.level = Number(process.env.LOGGER_LEVEL) || 3;
 
 Logger.info(`Server listening on port ${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}`);
