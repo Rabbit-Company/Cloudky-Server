@@ -26,7 +26,7 @@ describe("endpoints", () => {
 
 	test("account token", async () => {
     const res = await fetch('http://0.0.0.0:8085/v1/account/token', {
-			method: 'GET',
+			method: 'POST',
 			headers: {
 				Authorization: 'Basic ' + Buffer.from(username + ':' + password).toString('base64')
 			}
