@@ -6,7 +6,7 @@ const email = 'test@test.com';
 const password = 'a71079d42853dea26e453004338670a53814b78137ffbed07603a41d76a483aa9bc33b582f77d30a65e6f29a896c0411f38312e1d66e0bf16386c86a89bea572';
 
 let token = '';
-let fileCount = 0;
+let files: FileInformation[] = [];
 
 describe("endpoints", () => {
 
@@ -55,7 +55,7 @@ describe("endpoints", () => {
 			}
 		});
 		const data = await res.json() as { error: number, info: string, data: FileInformation[] | null };
-		fileCount = data.data?.length || 0;
+		files = data.data || [];
     expect(data?.error).toBe(0);
   });
 });
