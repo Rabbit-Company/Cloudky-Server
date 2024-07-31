@@ -26,6 +26,7 @@ export default class Errors{
 		1020: 'Provided uploadID needs to be UUIDv4',
 		1021: 'Provided expiration timestamp is invalid.',
 		1022: 'Share Link can not be created on non-existing file or folder.',
+		1023: 'Provided share link is invalid.',
 		2000: 'Something went wrong while trying to perform this action. Please try again later.',
 		9999: 'Your do not have permission to perform this action.'
 	};
