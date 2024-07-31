@@ -32,14 +32,14 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.564.0",
-    "@aws-sdk/s3-request-presigner": "^3.564.0",
+    "@aws-sdk/client-s3": "^3.621.0",
+    "@aws-sdk/s3-request-presigner": "^3.621.0",
     "@rabbit-company/blake2b": "^2.0.0",
     "@rabbit-company/logger": "^3.1.0",
     "d1-api": "^0.1.0",
     "ioredis": "^5.4.1",
-    "mariadb": "^3.3.0",
-    "mysql2": "^3.9.7",
-    "prom-client": "^15.1.2"
+    "mariadb": "^3.3.1",
+    "mysql2": "^3.11.0",
+    "prom-client": "^15.1.3"
   }
 }
