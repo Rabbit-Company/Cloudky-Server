@@ -25,6 +25,11 @@ export default class Validate{
 		return token.length === 128;
 	}
 
+	static expiration(expiration: bigint | number | null | undefined): boolean{
+		if(typeof expiration !== 'bigint' && typeof expiration !== 'number') return false;
+		return Number(expiration) > Date.now();
+	}
+
 	static userFilePathName(filePathName: string | null | undefined): boolean{
 		if(typeof(filePathName) !== 'string') return false;
 		if(filePathName.includes('..')) return false;
