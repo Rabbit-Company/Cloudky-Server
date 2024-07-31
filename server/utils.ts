@@ -1,4 +1,5 @@
 import { type SupportedCryptoAlgorithms } from "bun";
+import Errors from "./errors";
 
 export enum PERMISSIONS {
 	CREATE_SHARE_LINKS = 0x00000001,
@@ -21,6 +22,13 @@ export default class Utils{
 
 	static jsonResponse(json: object, statusCode = 200){
 		return new Response(JSON.stringify(json), {
+			headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+			status: statusCode
+		});
+	}
+
+	static jsonError(error: number, statusCode = 200){
+		return new Response(JSON.stringify(Errors.getJson(error)), {
 			headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
 			status: statusCode
 		});
