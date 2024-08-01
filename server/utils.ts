@@ -1,7 +1,7 @@
 import { type SupportedCryptoAlgorithms } from "bun";
 import Errors from "./errors";
 
-export enum PERMISSIONS {
+export const enum PERMISSIONS {
 	CREATE_SHARE_LINKS = 0x00000001,
 	EMAIL_SHARE_LINKS = 0x00000002,
 };
@@ -27,10 +27,11 @@ export default class Utils{
 		});
 	}
 
-	static jsonError(error: number, statusCode = 200){
+	static jsonError(error: number){
 		return new Response(JSON.stringify(Errors.getJson(error)), {
-			headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-			status: statusCode
+			headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+			status: error,
+			statusText: Errors.get(error)
 		});
 	}
 

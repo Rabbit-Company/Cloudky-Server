@@ -38,5 +38,5 @@ export default async function handleShareLinkCreate(req: Request, match: Matched
 	let result = await DB.prepareModify('INSERT INTO "ShareLinks"("Token","Path","Username","Password","Downloaded","Expiration","Created","Accessed") VALUES(?,?,?,?,?,?,?,?)', [id, data.path, auth.user, data.password, 0, data.expiration, timestamp, timestamp]);
 	if(!result) return Utils.jsonError(2000);
 
-	return Utils.jsonError(0);
+	return Utils.jsonResponse({ 'error': 0, 'info': 'Success' });
 }

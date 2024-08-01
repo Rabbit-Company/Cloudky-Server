@@ -1,13 +1,12 @@
 export default class Errors{
 
 	static list: { [key: number]: string } = {
-		0: 'Success',
 		404: 'Invalid API endpoint',
 		1000: 'Bearer Token is missing in Authorization header.',
 		1001: 'Not all required data provided in json format.',
 		1002: 'Registration is disabled on this server.',
 		1003: 'Username can only contain lowercase characters, numbers and hyphens. It also needs to start with lowercase character and be between 4 and 30 characters long.',
-		1004: 'Password needs to be hashed with Blake2b. The length of hashed password needs to be 128 characters.',
+		1004: 'Password must be hashed using Blake2b algorithm.',
 		1005: 'Provided file name can not contain special characters.',
 		1006: 'Provided file is invalid.',
 		1007: 'Username is already registered.',

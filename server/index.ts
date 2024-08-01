@@ -51,7 +51,7 @@ export const httpServer = Bun.serve({
 
 		const start = process.hrtime();
 		const match = router.match(path);
-		if(!match) return Utils.jsonError(404, 404);
+		if(!match) return Utils.jsonError(404);
 
 		const { src } = match;
 
@@ -73,7 +73,7 @@ export const httpServer = Bun.serve({
 			return res;
 		}catch(err){
 			Logger.error(`[GENERAL] ${err}`);
-			return Utils.jsonError(2000, 500);
+			return Utils.jsonError(2000);
 		}
 	}
 });
@@ -131,7 +131,7 @@ if(process.env.S3_ENABLED !== 'true'){
 
 			if(server.upgrade(req, { data })) return;
 
-			return Utils.jsonError(2000, 500);
+			return Utils.jsonError(2000);
 		},
 		websocket: {
 			idleTimeout: 120,
