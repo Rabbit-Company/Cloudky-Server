@@ -1,4 +1,3 @@
-import Utils from './utils.ts';
 import Logger from '@rabbit-company/logger';
 import Redis from './database/redis.ts';
 import DB from './database/database.ts';
@@ -6,6 +5,7 @@ import Scheduler from './scheduler.ts';
 import Validate from './validate.ts';
 import { saveChunk, type ChunkData, buildChunks } from './chunks.ts';
 import Metrics from './metrics.ts';
+import { generateHash, jsonError } from './utils.ts';
 
 await Redis.initialize();
 await DB.initialize();
@@ -51,7 +51,7 @@ export const httpServer = Bun.serve({
 
 		const start = process.hrtime();
 		const match = router.match(path);
-		if(!match) return Utils.jsonError(404);
+		if(!match) return jsonError(404);
 
 		const { src } = match;
 
@@ -73,7 +73,7 @@ export const httpServer = Bun.serve({
 			return res;
 		}catch(err){
 			Logger.error(`[GENERAL] ${err}`);
-			return Utils.jsonError(2000);
+			return jsonError(2000);
 		}
 	}
 });
@@ -103,15 +103,15 @@ if(process.env.S3_ENABLED !== 'true'){
 
 			Logger.http(`WebSocket - ${ip} - ${username}`);
 
-			if(!Validate.username(username)) return Utils.jsonError(1012);
-			if(!Validate.token(token)) return Utils.jsonError(1016);
-			if(!Validate.uuid(uploadID)) return Utils.jsonError(1020);
-			if(!Validate.userFilePathName(path)) return Utils.jsonError(1005);
+			if(!Validate.username(username)) return jsonError(1012);
+			if(!Validate.token(token)) return jsonError(1016);
+			if(!Validate.uuid(uploadID)) return jsonError(1020);
+			if(!Validate.userFilePathName(path)) return jsonError(1005);
 
-			let hashedIP = await Utils.generateHash(ip || '', 'sha256');
+			let hashedIP = await generateHash(ip || '', 'sha256');
 			let token2 = await Redis.getString(`token_${username}_${hashedIP}`);
-			if(!Validate.token(token2)) return Utils.jsonError(1017);
-			if(token !== token2) return Utils.jsonError(1017);
+			if(!Validate.token(token2)) return jsonError(1017);
+			if(token !== token2) return jsonError(1017);
 
 			let chunkData: ChunkData = {
 				owner: username as string,
@@ -131,7 +131,7 @@ if(process.env.S3_ENABLED !== 'true'){
 
 			if(server.upgrade(req, { data })) return;
 
-			return Utils.jsonError(2000);
+			return jsonError(2000);
 		},
 		websocket: {
 			idleTimeout: 120,
