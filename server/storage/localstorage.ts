@@ -30,6 +30,14 @@ export default class LocalStorage{
 		}
 	}
 
+	static async userFileExists(username: string, key: string): Promise<boolean | null>{
+		try{
+			return await Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`).exists();
+		}catch{
+			return null;
+		}
+	}
+
 	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean>{
 		try{
 			await Bun.write(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`, body, { createPath: true });

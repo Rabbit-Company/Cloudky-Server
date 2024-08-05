@@ -12,6 +12,7 @@ import {
 } from "@aws-sdk/client-s3";
 import type { FileInformation } from './storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import DB from '../database/database';
 
 export default class S3{
 	static S3 = new S3Client({
@@ -35,6 +36,16 @@ export default class S3{
 
 			if(!res.Contents) return false;
 			return res.Contents;
+		}catch(err){
+			Logger.error(`[S3] ${err}`);
+			return null;
+		}
+	}
+
+	static async userFileExists(username: string, key: string): Promise<boolean | null>{
+		try{
+			let results = await DB.prepare('SELECT * FROM "Files" WHERE "Username" = ? AND "Path" = ?', [username, key]);
+			return results !== null && results.length > 0;
 		}catch(err){
 			Logger.error(`[S3] ${err}`);
 			return null;

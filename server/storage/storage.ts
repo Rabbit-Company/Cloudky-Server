@@ -40,6 +40,13 @@ export default class Storage{
 		return await LocalStorage.uploadUserFile(username, key, body);
 	}
 
+	static async userFileExists(username: string, key: string): Promise<boolean | null>{
+		if(process.env.S3_ENABLED === 'true'){
+			return await S3.userFileExists(username, key);
+		}
+		return await LocalStorage.userFileExists(username, key);
+	}
+
 	static calculateStorageUsage(files: FileInformation[]): number{
 		let storageUsed = 0;
 		files.forEach(file => {

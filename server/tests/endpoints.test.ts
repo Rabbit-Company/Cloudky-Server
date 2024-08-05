@@ -1,5 +1,6 @@
 import { expect, test, describe } from "bun:test";
 import type { FileInformation } from "../storage/storage";
+import type { ShareLinks } from "../sharelinks/sharelinks";
 
 const username = 'test';
 const email = 'test@test.com';
@@ -7,6 +8,7 @@ const password = 'a71079d42853dea26e453004338670a53814b78137ffbed07603a41d76a483
 
 let token = '';
 let files: FileInformation[] = [];
+let shareLink = '';
 
 describe("endpoints", () => {
 
@@ -97,6 +99,42 @@ describe("endpoints", () => {
 		});
 		let fileContent = await res.text();
     expect(fileContent).toBe('Hello World!');
+  });
+
+	test("sharelink create", async () => {
+		const res = await fetch('http://0.0.0.0:8085/v1/sharelink/create', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Basic ' + Buffer.from(username + ':' + token).toString('base64')
+			},
+			body: JSON.stringify({ path: 'test/test.txt', password: null, expiration: null })
+		});
+		const data = await res.json() as { error: number, info: string };
+    expect(data?.error).toBe(0);
+  });
+
+	test("sharelink list", async () => {
+		const res = await fetch('http://0.0.0.0:8085/v1/sharelink/list', {
+			method: 'GET',
+			headers: {
+				Authorization: 'Basic ' + Buffer.from(username + ':' + token).toString('base64')
+			}
+		});
+		const data = await res.json() as { error: number, info: string, links?: ShareLinks[] };
+		if(data.links?.length) shareLink = data.links[0].Token;
+    expect(data?.error).toBe(0);
+  });
+
+	test("sharelink delete", async () => {
+		const res = await fetch('http://0.0.0.0:8085/v1/sharelink/delete', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Basic ' + Buffer.from(username + ':' + token).toString('base64')
+			},
+			body: JSON.stringify({ link: shareLink })
+		});
+		const data = await res.json() as { error: number, info: string };
+    expect(data?.error).toBe(0);
   });
 
 	test("file delete", async () => {

@@ -3,6 +3,7 @@ import DB from "../../../database/database";
 import { authenticateUser, generateRandomText, jsonError, jsonResponse } from "../../../utils";
 import Validate from "../../../validate";
 import Metrics from "../../../metrics";
+import LocalStorage from "../../../storage/localstorage";
 
 export default async function handleShareLinkCreate(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'POST') return jsonError(404);
@@ -25,8 +26,7 @@ export default async function handleShareLinkCreate(req: Request, match: Matched
 	if(data.password !== null && !Validate.password(data.password)) return jsonError(1004);
 	if(data.expiration !== null && !Validate.expiration(data.expiration)) return jsonError(1021);
 
-	let results = await DB.prepare('SELECT * FROM "Files" WHERE "Username" = ? AND "Path" = ?', [user,data.path]);
-	if(results === null || results.length === 0) return jsonError(1022);
+	if(!(await LocalStorage.userFileExists(user, data.path))) return jsonError(1022);
 
 	const id = generateRandomText(15);
 
