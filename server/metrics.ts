@@ -1,6 +1,6 @@
 import * as Prometheus from "prom-client";
 
-export namespace Metrics {
+namespace Metrics {
 	export function initialize() {
 		Prometheus.register.setContentType(Prometheus.Registry.OPENMETRICS_CONTENT_TYPE);
 	}

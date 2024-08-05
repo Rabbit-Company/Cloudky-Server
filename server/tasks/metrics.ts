@@ -4,7 +4,7 @@ import * as Prometheus from "prom-client";
 import Metrics from "../metrics";
 import { httpServer } from "..";
 
-export namespace TaskMetrics {
+namespace TaskMetrics {
 	export async function run() {
 		Logger.silly("[METRICS] Task started");
 		Metrics.http_concurrent_requests_total.set(httpServer.pendingRequests);

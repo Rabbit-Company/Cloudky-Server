@@ -1,4 +1,4 @@
-export namespace Errors {
+namespace Errors {
 	export const list: { [key: number]: { message: string; httpCode: number } } = {
 		404: { message: "Invalid API endpoint", httpCode: 404 },
 		1000: { message: "Bearer Token is missing in Authorization header.", httpCode: 401 },

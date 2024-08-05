@@ -1,7 +1,7 @@
 import D1API from "d1-api";
 import DB from "./database";
 
-export namespace D1 {
+namespace D1 {
 	export const connection: D1API = new D1API({
 		accountId: process.env.CF_ACCOUNT_ID || "",
 		apiKey: process.env.CF_API_KEY || "",

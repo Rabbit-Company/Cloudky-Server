@@ -5,7 +5,7 @@ import MariaDB from "./mariadb";
 import D1 from "./d1";
 import Logger from "@rabbit-company/logger";
 
-export namespace DB {
+namespace DB {
 	export async function initialize() {
 		if (process.env.DB_TYPE === "mariadb") {
 			await MariaDB.initialize();

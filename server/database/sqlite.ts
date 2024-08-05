@@ -1,6 +1,6 @@
 import Database from "bun:sqlite";
 
-export namespace SQLite {
+namespace SQLite {
 	export const connection: Database = new Database(process.env.SQLITE_FILE || "cloudky.sqlite", { readwrite: true, create: true });
 
 	export function initialize() {

@@ -1,7 +1,7 @@
 import mysql, { type Pool } from "mysql2/promise";
 import DB from "./database";
 
-export namespace MySQL {
+namespace MySQL {
 	export const connection: Pool = mysql.createPool({
 		host: process.env.MYSQL_HOST,
 		port: Number(process.env.MYSQL_PORT || 3306),

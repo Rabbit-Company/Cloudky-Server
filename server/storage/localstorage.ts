@@ -5,7 +5,7 @@ import type { BunFile } from "bun";
 import { mkdir, unlink, rename, readdir, rm } from "fs/promises";
 import path from "node:path";
 
-export namespace LocalStorage {
+namespace LocalStorage {
 	export async function listUserFiles(username: string): Promise<FileInformation[]> {
 		try {
 			const glob = new Glob("**");

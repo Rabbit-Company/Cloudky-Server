@@ -14,7 +14,7 @@ import type { FileInformation } from "./storage";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import DB from "../database/database";
 
-export namespace S3 {
+namespace S3 {
 	export const S3 = new S3Client({
 		region: process.env.S3_REGION,
 		endpoint: process.env.S3_ENDPOINT,

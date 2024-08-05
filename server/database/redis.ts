@@ -1,7 +1,7 @@
 import Logger from "@rabbit-company/logger";
 import IORedis from "ioredis";
 
-export namespace Redis {
+namespace Redis {
 	export const localCache: IORedis = new IORedis(process.env.REDIS_LOCAL || "redis://localhost/", { connectTimeout: 500, commandTimeout: 500 });
 	export const externalCache: IORedis = new IORedis(process.env.REDIS_EXTERNAL || "redis://localhost/", { connectTimeout: 2000, commandTimeout: 2000 });
 

@@ -1,7 +1,7 @@
 import mariadb from "mariadb";
 import DB from "./database";
 
-export namespace MariaDB {
+namespace MariaDB {
 	export const connection = mariadb.createPool({
 		host: process.env.MARIADB_HOST,
 		port: Number(process.env.MARIADB_PORT || 3306),

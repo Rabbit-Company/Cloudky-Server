@@ -8,7 +8,7 @@ export interface FileInformation {
 	Size: number;
 }
 
-export namespace Storage {
+namespace Storage {
 	export async function listUserFiles(username: string): Promise<FileInformation[] | null> {
 		if (process.env.S3_ENABLED === "true") {
 			return await S3.listUserFiles(username);
