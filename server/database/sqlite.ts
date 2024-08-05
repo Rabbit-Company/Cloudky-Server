@@ -1,9 +1,9 @@
 import Database from "bun:sqlite";
 
-export namespace SQLite{
+export namespace SQLite {
 	export const connection: Database = new Database(process.env.SQLITE_FILE || "cloudky.sqlite", { readwrite: true, create: true });
 
-	export function initialize(){
+	export function initialize() {
 		connection.run("PRAGMA journal_mode = WAL;");
 		connection.run(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(

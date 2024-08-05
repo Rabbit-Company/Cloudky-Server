@@ -5,26 +5,26 @@ import Storage from "../../../storage/storage";
 import Metrics from "../../../metrics";
 
 export default async function handleFileMove(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if(req.method !== 'POST') return jsonError(404);
+	if (req.method !== "POST") return jsonError(404);
 
 	let data: any;
-	try{
+	try {
 		data = await req.json();
-	}catch{
+	} catch {
 		return jsonError(1001);
 	}
 
 	const { user, error } = await authenticateUser(req, ip);
-  if(error) return error;
+	if (error) return error;
 
-	if(Number(process.env.METRICS_TYPE) >= 3){
+	if (Number(process.env.METRICS_TYPE) >= 3) {
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
 	}
 
 	let res = await Storage.moveUserFiles(user, data.files, data.destination);
-	if(res === false) return jsonError(2000);
+	if (res === false) return jsonError(2000);
 
 	await Redis.deleteString(`filelist_${user}`);
 
-	return jsonResponse({ 'error': 0, 'info': 'Success' });
+	return jsonResponse({ error: 0, info: "Success" });
 }

@@ -1,7 +1,7 @@
 import Blake2b from "@rabbit-company/blake2b";
 import Logger from "@rabbit-company/logger";
 
-export interface ChunkData{
+export interface ChunkData {
 	owner: string;
 	uploadID: string;
 	path: string;
@@ -11,17 +11,17 @@ export interface ChunkData{
 	created: number;
 }
 
-export async function saveChunk(chunkData: ChunkData, data: Buffer): Promise<boolean>{
-	let hash = Blake2b.hash(data, '');
-	if(!chunkData.chunks.includes(hash)) return false;
-	if(chunkData.completed.has(hash)) return false;
+export async function saveChunk(chunkData: ChunkData, data: Buffer): Promise<boolean> {
+	let hash = Blake2b.hash(data, "");
+	if (!chunkData.chunks.includes(hash)) return false;
+	if (chunkData.completed.has(hash)) return false;
 
 	const targetPath = `${process.env.DATA_DIRECTORY}/tmp/${chunkData.owner}/${chunkData.uploadID}/${hash}`;
-	try{
+	try {
 		await Bun.write(targetPath, data, { createPath: true });
 		chunkData.size += data.length;
-	}catch(err){
-		Logger.error('[CHUNK] Saving');
+	} catch (err) {
+		Logger.error("[CHUNK] Saving");
 		return false;
 	}
 
@@ -29,23 +29,23 @@ export async function saveChunk(chunkData: ChunkData, data: Buffer): Promise<boo
 	return true;
 }
 
-export async function buildChunks(chunkData: ChunkData): Promise<boolean>{
-	if(chunkData.chunks.length !== chunkData.completed.size) return false;
+export async function buildChunks(chunkData: ChunkData): Promise<boolean> {
+	if (chunkData.chunks.length !== chunkData.completed.size) return false;
 
 	const chunkPath = `${process.env.DATA_DIRECTORY}/tmp/${chunkData.owner}/${chunkData.uploadID}`;
 	const targetPath = `${process.env.DATA_DIRECTORY}/data/${chunkData.owner}/${chunkData.path}`;
 
 	const file = Bun.file(targetPath);
-	try{
+	try {
 		const writer = file.writer();
-		for(let i = 0; i < chunkData.chunks.length; i++){
+		for (let i = 0; i < chunkData.chunks.length; i++) {
 			const chunk = chunkData.chunks[i];
 			writer.write(await Bun.file(`${chunkPath}/${chunk}`).arrayBuffer());
 			writer.flush();
 		}
 		writer.end();
-	}catch(err){
-		Logger.error('[CHUNK] Building');
+	} catch (err) {
+		Logger.error("[CHUNK] Building");
 		return false;
 	}
 	return true;
