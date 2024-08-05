@@ -1,6 +1,5 @@
 import { type MatchedRoute } from "bun";
 import Redis from "../../../database/redis";
-import Errors from "../../../errors";
 import { basicAuthentication, generateHash, generateRandomText, jsonError, jsonResponse } from "../../../utils";
 import Validate from "../../../validate";
 import DB from "../../../database/database";
