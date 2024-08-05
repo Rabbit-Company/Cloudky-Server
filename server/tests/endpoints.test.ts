@@ -47,6 +47,22 @@ describe("endpoints", () => {
     expect(data?.error).toBe(0);
   });
 
+	test("file upload", async () => {
+		const formData = new FormData();
+		formData.append('name', 'test.txt');
+		formData.append('file', new Blob(['Hello World!'], { type: "text/xml" }));
+
+		const res = await fetch('http://0.0.0.0:8085/v1/file/upload', {
+			method: 'PUT',
+			headers: {
+				Authorization: 'Basic ' + Buffer.from(username + ':' + token).toString('base64')
+			},
+			body: formData
+		});
+		const data = await res.json() as { error: number, info: string };
+    expect(data?.error).toBe(0);
+  });
+
 	test("file list", async () => {
 		const res = await fetch('http://0.0.0.0:8085/v1/file/list', {
 			method: 'GET',
@@ -58,4 +74,29 @@ describe("endpoints", () => {
 		files = data.data || [];
     expect(data?.error).toBe(0);
   });
+
+	test("file move", async () => {
+		const res = await fetch('http://0.0.0.0:8085/v1/file/move', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Basic ' + Buffer.from(username + ':' + token).toString('base64')
+			},
+			body: JSON.stringify({ files: ['test.txt'], destination: 'test/' })
+		});
+		const data = await res.json() as { error: number, info: string };
+    expect(data?.error).toBe(0);
+  });
+
+	test("file delete", async () => {
+		const res = await fetch('http://0.0.0.0:8085/v1/file/delete', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Basic ' + Buffer.from(username + ':' + token).toString('base64')
+			},
+			body: JSON.stringify({ paths: ['test/test.txt'] })
+		});
+		const data = await res.json() as { error: number, info: string };
+    expect(data?.error).toBe(0);
+  });
+
 });

@@ -4,7 +4,7 @@ import {
 } from "@aws-sdk/client-s3";
 import type { FileInformation } from './storage';
 import type { BunFile } from 'bun';
-import { mkdir, unlink, rename } from 'fs/promises';
+import { mkdir, unlink, rename, readdir, rm } from 'fs/promises';
 import path from 'node:path';
 
 export default class LocalStorage{
@@ -65,10 +65,22 @@ export default class LocalStorage{
 
 	static async deleteUserFiles(username: string, keys: string[]): Promise<boolean>{
 		try{
-			keys.forEach(async key => {
-				let path = `${process.env.DATA_DIRECTORY}/data/${username}/${key}`;
-				if(await Bun.file(path).exists()) await unlink(path);
-			});
+			const dirPath = `${process.env.DATA_DIRECTORY}/data/${username}`;
+
+			await Promise.all(keys.map(async key => {
+				const filePath = `${dirPath}/${key}`;
+				if (await Bun.file(filePath).exists()) await unlink(filePath);
+
+				const parentDir = filePath.substring(0, filePath.lastIndexOf('/'));
+
+				let numOfFiles = 0;
+				const glob = new Glob("**");
+				for await (const fileName of glob.scan({cwd: parentDir, dot: true, onlyFiles: true, absolute: false})) {
+					if(!fileName.includes('.DS_Store')) numOfFiles++;
+				}
+				if(numOfFiles === 0) await rm(parentDir, { force: true, recursive: true });
+			}));
+
 			return true;
 		}catch{
 			return false;

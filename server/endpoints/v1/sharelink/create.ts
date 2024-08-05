@@ -1,8 +1,8 @@
 import type { MatchedRoute } from "bun";
 import DB from "../../../database/database";
-import Redis from "../../../database/redis";
-import { basicAuthentication, generateHash, generateRandomText, jsonError, jsonResponse } from "../../../utils";
+import { authenticateUser, generateRandomText, jsonError, jsonResponse } from "../../../utils";
 import Validate from "../../../validate";
+import Metrics from "../../../metrics";
 
 export default async function handleShareLinkCreate(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if(req.method !== 'POST') return jsonError(404);
@@ -14,28 +14,24 @@ export default async function handleShareLinkCreate(req: Request, match: Matched
 		return jsonError(1001);
 	}
 
-	const auth = basicAuthentication(req);
-	if(auth === null) return jsonError(1018);
+	const { user, error } = await authenticateUser(req, ip);
+  if(error) return error;
 
-	if(!Validate.username(auth.user)) return jsonError(1012);
-	if(!Validate.token(auth.pass)) return jsonError(1016);
-
-	let hashedIP = await generateHash(ip || '', 'sha256');
-	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
-	if(!Validate.token(token)) return jsonError(1017);
-	if(auth.pass !== token) return jsonError(1017);
+	if(Number(process.env.METRICS_TYPE) >= 3){
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
+	}
 
 	if(!Validate.userFilePathName(data.path)) return jsonError(1005);
 	if(data.password !== null && !Validate.password(data.password)) return jsonError(1004);
 	if(data.expiration !== null && !Validate.expiration(data.expiration)) return jsonError(1021);
 
-	let results = await DB.prepare('SELECT * FROM "Files" WHERE "Username" = ? AND "Path" = ?', [auth.user,data.path]);
+	let results = await DB.prepare('SELECT * FROM "Files" WHERE "Username" = ? AND "Path" = ?', [user,data.path]);
 	if(results === null || results.length === 0) return jsonError(1022);
 
 	const id = generateRandomText(15);
 
 	let timestamp = Date.now();
-	let result = await DB.prepareModify('INSERT INTO "ShareLinks"("Token","Path","Username","Password","Downloaded","Expiration","Created","Accessed") VALUES(?,?,?,?,?,?,?,?)', [id, data.path, auth.user, data.password, 0, data.expiration, timestamp, timestamp]);
+	let result = await DB.prepareModify('INSERT INTO "ShareLinks"("Token","Path","Username","Password","Downloaded","Expiration","Created","Accessed") VALUES(?,?,?,?,?,?,?,?)', [id, data.path, user, data.password, 0, data.expiration, timestamp, timestamp]);
 	if(!result) return jsonError(2000);
 
 	return jsonResponse({ 'error': 0, 'info': 'Success' });

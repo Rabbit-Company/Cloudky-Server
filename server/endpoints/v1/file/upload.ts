@@ -1,5 +1,5 @@
 import type { MatchedRoute } from "bun";
-import { basicAuthentication, generateHash, jsonError, jsonResponse } from "../../../utils";
+import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
 import Validate from "../../../validate";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
@@ -8,25 +8,17 @@ import Metrics from "../../../metrics";
 
 export default async function handleFileUpload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 
-	const auth = basicAuthentication(req);
-	if(auth === null) return jsonError(1018);
-
-	if(!Validate.username(auth.user)) return jsonError(1012);
-	if(!Validate.token(auth.pass)) return jsonError(1016);
-
-	let hashedIP = await generateHash(ip || '', 'sha256');
-	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
-	if(!Validate.token(token)) return jsonError(1017);
-	if(auth.pass !== token) return jsonError(1017);
+	const { user, error } = await authenticateUser(req, ip);
+  if(error) return error;
 
 	if(Number(process.env.METRICS_TYPE) >= 3){
-		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
 	}
 
 	if(req.method === 'POST' && process.env.S3_ENABLED === 'true'){
-		return await s3FileUpload(req, auth.user);
+		return await s3FileUpload(req, user);
 	}else if(req.method === 'PUT' && process.env.S3_ENABLED !== 'true'){
-		return await localFileUpload(req, auth.user);
+		return await localFileUpload(req, user);
 	}else{
 		return jsonError(404);
 	}

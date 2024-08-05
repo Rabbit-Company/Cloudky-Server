@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run server/index.ts",
+		"test": "bun test",
     "watch": "bun --watch server/index.ts",
     "build": "bun build server/index.ts --compile --minify --outfile ./cloudky-server"
   },

@@ -1,5 +1,7 @@
 import { type SupportedCryptoAlgorithms } from "bun";
 import Errors from "./errors";
+import Validate from "./validate";
+import Redis from "./database/redis";
 
 export const enum PERMISSIONS {
 	CREATE_SHARE_LINKS = 0x00000001,
@@ -28,8 +30,8 @@ export function jsonResponse(json: object, statusCode = 200){
 export function jsonError(error: number){
 	return new Response(JSON.stringify(Errors.getJson(error)), {
 		headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-		status: error,
-		statusText: Errors.get(error)
+		//status: error,
+		//statusText: Errors.get(error)
 	});
 }
 
@@ -70,4 +72,19 @@ export function generateRandomText(length: number) : string {
 	}
 
 	return apiKey;
+}
+
+export async function authenticateUser(req: Request, ip: string | undefined): Promise<{ user: string, error: Response | null }> {
+	const auth = basicAuthentication(req);
+	if (auth === null) return { user: '', error: jsonError(1018) };
+
+	if (!Validate.username(auth.user)) return { user: '', error: jsonError(1012) };
+	if (!Validate.token(auth.pass)) return { user: '', error: jsonError(1016) };
+
+	let hashedIP = await generateHash(ip || '', 'sha256');
+	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
+	if (!Validate.token(token)) return { user: '', error: jsonError(1017) };
+	if (auth.pass !== token) return { user: '', error: jsonError(1017) };
+
+	return { user: auth.user, error: null };
 }
