@@ -1,11 +1,11 @@
 import Database from "bun:sqlite";
 
-export default class SQLite{
-	static DB: Database = new Database(process.env.SQLITE_FILE || "cloudky.sqlite", { readwrite: true, create: true });
+export namespace SQLite{
+	export const connection: Database = new Database(process.env.SQLITE_FILE || "cloudky.sqlite", { readwrite: true, create: true });
 
-	static initialize(){
-		SQLite.DB.run("PRAGMA journal_mode = WAL;");
-		SQLite.DB.run(`
+	export function initialize(){
+		connection.run("PRAGMA journal_mode = WAL;");
+		connection.run(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
 				"Username" TEXT PRIMARY KEY,
 				"Email" TEXT NOT NULL,
@@ -50,3 +50,5 @@ export default class SQLite{
 		`);
 	}
 }
+
+export default SQLite;

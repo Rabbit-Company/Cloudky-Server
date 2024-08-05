@@ -1,14 +1,14 @@
 import D1API from 'd1-api';
 import DB from './database';
 
-export default class D1{
-	static DB: D1API = new D1API({
+export namespace D1{
+	export const connection: D1API = new D1API({
 		accountId: process.env.CF_ACCOUNT_ID || '',
 		apiKey: process.env.CF_API_KEY || '',
 		databaseId: process.env.CF_DATABASE_ID || ''
 	});
 
-	static async initialize(){
+	export async function initialize(){
 		const resPromises = [
 			DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
@@ -66,3 +66,5 @@ export default class D1{
 		if(!res || !res2 || !res3 || !res4) process.exit();
 	}
 }
+
+export default D1;

@@ -10,44 +10,44 @@ export interface FileInformation {
   Size: number;
 }
 
-export default class Storage{
+export namespace Storage{
 
-	static async listUserFiles(username: string): Promise<FileInformation[] | null>{
+	export async function listUserFiles(username: string): Promise<FileInformation[] | null>{
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.listUserFiles(username);
 		}
 		return await LocalStorage.listUserFiles(username);
 	}
 
-	static async moveUserFiles(username: string, keys: string[], destination: string){
+	export async function moveUserFiles(username: string, keys: string[], destination: string){
 		if(process.env.S3_ENABLED === 'true'){
 			return false;
 		}
 		return await LocalStorage.moveUserFiles(username, keys, destination);
 	}
 
-	static async deleteUserFiles(username: string, keys: string[]){
+	export async function deleteUserFiles(username: string, keys: string[]){
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.deleteUserFiles(username, keys);
 		}
 		return await LocalStorage.deleteUserFiles(username, keys);
 	}
 
-	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{
+	export async function uploadUserFile(username: string, key: string, body: any): Promise<boolean | null>{
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.uploadUserFile(username, key, body);
 		}
 		return await LocalStorage.uploadUserFile(username, key, body);
 	}
 
-	static async userFileExists(username: string, key: string): Promise<boolean | null>{
+	export async function userFileExists(username: string, key: string): Promise<boolean | null>{
 		if(process.env.S3_ENABLED === 'true'){
 			return await S3.userFileExists(username, key);
 		}
 		return await LocalStorage.userFileExists(username, key);
 	}
 
-	static calculateStorageUsage(files: FileInformation[]): number{
+	export function calculateStorageUsage(files: FileInformation[]): number{
 		let storageUsed = 0;
 		files.forEach(file => {
 			storageUsed += file.Size;
@@ -55,3 +55,5 @@ export default class Storage{
 		return storageUsed / (1024 * 1024);
 	}
 }
+
+export default Storage;

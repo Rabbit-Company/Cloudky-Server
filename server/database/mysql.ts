@@ -1,8 +1,9 @@
 import mysql, { type Pool } from 'mysql2/promise';
 import DB from './database';
 
-export default class MySQL{
-	static DB : Pool = mysql.createPool({
+export namespace MySQL{
+
+	export const connection : Pool = mysql.createPool({
 		host: process.env.MYSQL_HOST,
 		port: Number(process.env.MYSQL_PORT || 3306),
 		database: process.env.MYSQL_DATABASE,
@@ -17,7 +18,7 @@ export default class MySQL{
 		keepAliveInitialDelay: 0
 	});
 
-	static async initialize(){
+	export async function initialize(){
 		let res = await DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
 				"Username" VARCHAR(30) PRIMARY KEY,
@@ -63,3 +64,5 @@ export default class MySQL{
 		if(!res) process.exit();
 	}
 }
+
+export default MySQL;

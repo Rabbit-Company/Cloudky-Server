@@ -1,8 +1,9 @@
 import mariadb from 'mariadb';
 import DB from './database';
 
-export default class MariaDB{
-	static DB = mariadb.createPool({
+export namespace MariaDB{
+
+	export const connection = mariadb.createPool({
 		host: process.env.MARIADB_HOST,
 		port: Number(process.env.MARIADB_PORT || 3306),
 		database: process.env.MARIADB_DATABASE,
@@ -14,7 +15,7 @@ export default class MariaDB{
 		acquireTimeout: 3000
 	});
 
-	static async initialize(){
+	export async function initialize(){
 		let res = await DB.prepareModify(`
 			CREATE TABLE IF NOT EXISTS "Accounts"(
 				"Username" VARCHAR(30) PRIMARY KEY,
@@ -60,3 +61,5 @@ export default class MariaDB{
 		if(!res) process.exit();
 	}
 }
+
+export default MariaDB;

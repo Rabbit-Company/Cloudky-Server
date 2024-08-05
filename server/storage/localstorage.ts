@@ -7,9 +7,9 @@ import type { BunFile } from 'bun';
 import { mkdir, unlink, rename, readdir, rm } from 'fs/promises';
 import path from 'node:path';
 
-export default class LocalStorage{
+export namespace LocalStorage{
 
-	static async listUserFiles(username: string): Promise<FileInformation[]>{
+	export async function listUserFiles(username: string): Promise<FileInformation[]>{
 		try{
 			const glob = new Glob("**");
 			const path = `${process.env.DATA_DIRECTORY}/data/${username}/`;
@@ -30,7 +30,7 @@ export default class LocalStorage{
 		}
 	}
 
-	static async userFileExists(username: string, key: string): Promise<boolean | null>{
+	export async function userFileExists(username: string, key: string): Promise<boolean | null>{
 		try{
 			return await Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`).exists();
 		}catch{
@@ -38,7 +38,7 @@ export default class LocalStorage{
 		}
 	}
 
-	static async uploadUserFile(username: string, key: string, body: any): Promise<boolean>{
+	export async function uploadUserFile(username: string, key: string, body: any): Promise<boolean>{
 		try{
 			await Bun.write(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`, body, { createPath: true });
 			return true;
@@ -47,7 +47,7 @@ export default class LocalStorage{
 		}
 	}
 
-	static async downloadUserFile(username: string, key: string): Promise<BunFile | null>{
+	export async function downloadUserFile(username: string, key: string): Promise<BunFile | null>{
 		try{
 			let file = Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`);
 			if(!await file.exists()) return null;
@@ -57,7 +57,7 @@ export default class LocalStorage{
 		}
 	}
 
-	static async moveUserFiles(username: string, keys: string[], destination: string): Promise<boolean>{
+	export async function moveUserFiles(username: string, keys: string[], destination: string): Promise<boolean>{
 		try{
 			destination = `${process.env.DATA_DIRECTORY}/data/${username}/${destination}`;
 			await mkdir(destination, { recursive: true });
@@ -71,7 +71,7 @@ export default class LocalStorage{
 		}
 	}
 
-	static async deleteUserFiles(username: string, keys: string[]): Promise<boolean>{
+	export async function deleteUserFiles(username: string, keys: string[]): Promise<boolean>{
 		try{
 			const dirPath = `${process.env.DATA_DIRECTORY}/data/${username}`;
 
@@ -95,3 +95,5 @@ export default class LocalStorage{
 		}
 	}
 }
+
+export default LocalStorage;

@@ -1,6 +1,6 @@
-export default class Errors{
+export namespace Errors{
 
-	static list: { [key: number]: { message: string, httpCode: number } } = {
+	export const list: { [key: number]: { message: string, httpCode: number } } = {
 		404: { message: 'Invalid API endpoint', httpCode: 404 },
 		1000: { message: 'Bearer Token is missing in Authorization header.', httpCode: 401 },
 		1001: { message: 'Not all required data provided in json format.', httpCode: 400 },
@@ -30,11 +30,13 @@ export default class Errors{
 		9999: { message: 'Your do not have permission to perform this action.', httpCode: 403 }
 	};
 
-	static get(id: number){
-		return this.list[id];
+	export function get(id: number){
+		return list[id];
 	}
 
-	static getJson(id: number){
-		return { 'error': id, 'info': this.list[id].message };
+	export function getJson(id: number){
+		return { 'error': id, 'info': list[id].message };
 	}
 }
+
+export default Errors;
