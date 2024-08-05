@@ -33,8 +33,5 @@ export default async function handleAccountToken(req: Request, match: MatchedRou
 	let timestamp = Date.now();
 	await DB.prepare('UPDATE "Accounts" SET "Accessed" = ? WHERE "Username" = ?', [timestamp, auth.user]);
 
-	let json = Errors.getJson(0) as { error: number; info: string; token?: string };
-	json.token = token;
-
-	return jsonResponse(json);
+	return jsonResponse({ error: 0, info: 'Success', token: token });
 }

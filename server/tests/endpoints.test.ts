@@ -87,6 +87,17 @@ describe("endpoints", () => {
     expect(data?.error).toBe(0);
   });
 
+	test("file download", async () => {
+		const res = await fetch('http://0.0.0.0:8085/v1/file/download', {
+			method: 'POST',
+			headers: {
+				Authorization: 'Basic ' + Buffer.from(username + ':' + token).toString('base64')
+			},
+			body: JSON.stringify({ path: 'test/test.txt' })
+		});
+    expect(res.status).toBe(200);
+  });
+
 	test("file delete", async () => {
 		const res = await fetch('http://0.0.0.0:8085/v1/file/delete', {
 			method: 'POST',

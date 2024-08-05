@@ -30,8 +30,8 @@ export function jsonResponse(json: object, statusCode = 200){
 export function jsonError(error: number){
 	return new Response(JSON.stringify(Errors.getJson(error)), {
 		headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-		//status: error,
-		//statusText: Errors.get(error)
+		status: Errors.get(error).httpCode,
+		statusText: Errors.get(error).message
 	});
 }
 
