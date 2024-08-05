@@ -95,7 +95,8 @@ describe("endpoints", () => {
 			},
 			body: JSON.stringify({ path: 'test/test.txt' })
 		});
-    expect(res.status).toBe(200);
+		let fileContent = await res.text();
+    expect(fileContent).toBe('Hello World!');
   });
 
 	test("file delete", async () => {
