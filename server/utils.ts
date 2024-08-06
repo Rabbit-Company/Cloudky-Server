@@ -1,5 +1,5 @@
 import { type SupportedCryptoAlgorithms } from "bun";
-import Errors from "./errors";
+import Errors, { Error } from "./errors";
 import Validate from "./validate";
 import Redis from "./database/redis";
 
@@ -76,15 +76,15 @@ export function generateRandomText(length: number): string {
 
 export async function authenticateUser(req: Request, ip: string | undefined): Promise<{ user: string; error: Response | null }> {
 	const auth = basicAuthentication(req);
-	if (auth === null) return { user: "", error: jsonError(1018) };
+	if (auth === null) return { user: "", error: jsonError(Error.MISSING_USERNAME_AND_TOKEN) };
 
-	if (!Validate.username(auth.user)) return { user: "", error: jsonError(1012) };
-	if (!Validate.token(auth.pass)) return { user: "", error: jsonError(1016) };
+	if (!Validate.username(auth.user)) return { user: "", error: jsonError(Error.INVALID_USERNAME) };
+	if (!Validate.token(auth.pass)) return { user: "", error: jsonError(Error.INVALID_TOKEN) };
 
 	let hashedIP = await generateHash(ip || "", "sha256");
 	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
-	if (!Validate.token(token)) return { user: "", error: jsonError(1017) };
-	if (auth.pass !== token) return { user: "", error: jsonError(1017) };
+	if (!Validate.token(token)) return { user: "", error: jsonError(Error.TOKEN_EXPIRED) };
+	if (auth.pass !== token) return { user: "", error: jsonError(Error.TOKEN_EXPIRED) };
 
 	return { user: auth.user, error: null };
 }

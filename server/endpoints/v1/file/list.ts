@@ -4,9 +4,10 @@ import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
 import DB from "../../../database/database";
 import Metrics from "../../../metrics";
+import { Error } from "../../../errors";
 
 export default async function handleFileList(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "GET") return jsonError(404);
+	if (req.method !== "GET") return jsonError(Error.INVALID_ENDPOINT);
 
 	const { user, error } = await authenticateUser(req, ip);
 	if (error) return error;
@@ -23,7 +24,7 @@ export default async function handleFileList(req: Request, match: MatchedRoute |
 	}
 
 	if (result === null) result = await Storage.listUserFiles(user);
-	if (result === null) return jsonError(2000);
+	if (result === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	if (!fromCache) {
 		let storageUsage = Math.floor(Storage.calculateStorageUsage(result));

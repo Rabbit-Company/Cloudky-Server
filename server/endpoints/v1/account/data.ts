@@ -2,9 +2,10 @@ import type { MatchedRoute } from "bun";
 import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
 import DB from "../../../database/database";
 import Metrics from "../../../metrics";
+import { Error } from "../../../errors";
 
 export default async function handleAccountData(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "GET") return jsonError(404);
+	if (req.method !== "GET") return jsonError(Error.INVALID_ENDPOINT);
 
 	const { user, error } = await authenticateUser(req, ip);
 	if (error) return error;
@@ -30,7 +31,7 @@ export default async function handleAccountData(req: Request, match: MatchedRout
 		`,
 		[user]
 	);
-	if (result === null || result.length !== 1) return jsonError(2000);
+	if (result === null || result.length !== 1) return jsonError(Error.UNKNOWN_ERROR);
 
 	result[0].StorageType = process.env.S3_ENABLED === "true" ? "S3" : "LOCAL";
 

@@ -4,15 +4,16 @@ import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
 import Metrics from "../../../metrics";
 import Validate from "../../../validate";
+import { Error } from "../../../errors";
 
 export default async function handleFileRename(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "POST") return jsonError(404);
+	if (req.method !== "POST") return jsonError(Error.INVALID_ENDPOINT);
 
 	let data: any;
 	try {
 		data = await req.json();
 	} catch {
-		return jsonError(1001);
+		return jsonError(Error.REQUIRED_DATA_MISSING);
 	}
 
 	const { user, error } = await authenticateUser(req, ip);
@@ -22,11 +23,11 @@ export default async function handleFileRename(req: Request, match: MatchedRoute
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
 	}
 
-	if (!Validate.userFilePathName(data.path)) return jsonError(1005);
-	if (!Validate.userFilePathName(data.destination)) return jsonError(1005);
+	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
+	if (!Validate.userFilePathName(data.destination)) return jsonError(Error.INVALID_FILE_NAME);
 
 	let res = await Storage.renameUserFile(user, data.path, data.destination);
-	if (res === false) return jsonError(2000);
+	if (res === false) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${user}`);
 

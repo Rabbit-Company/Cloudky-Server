@@ -1,26 +1,27 @@
 import DB from "../../../database/database";
+import { Error } from "../../../errors";
 import { jsonError, jsonResponse } from "../../../utils";
 import Validate from "../../../validate";
 
 export default async function handleAccountCreate(req: Request): Promise<Response> {
-	if (req.method !== "POST") return jsonError(404);
-	if (process.env.ACCOUNT_CREATION === "false") return jsonError(1002);
+	if (req.method !== "POST") return jsonError(Error.INVALID_ENDPOINT);
+	if (process.env.ACCOUNT_CREATION === "false") return jsonError(Error.REGISTRATION_DISABLED);
 
 	let data: any;
 	try {
 		data = await req.json();
 	} catch {
-		return jsonError(1001);
+		return jsonError(Error.REQUIRED_DATA_MISSING);
 	}
 
-	if (!Validate.username(data.username)) return jsonError(1003);
-	if (!Validate.email(data.email)) return jsonError(1009);
-	if (!Validate.password(data.password)) return jsonError(1004);
-	if (!Validate.accountType(data.type)) return jsonError(1019);
+	if (!Validate.username(data.username)) return jsonError(Error.INVALID_USERNAME_FORMAT);
+	if (!Validate.email(data.email)) return jsonError(Error.INVALID_EMAIL);
+	if (!Validate.password(data.password)) return jsonError(Error.PASSWORD_NOT_HASHED);
+	if (!Validate.accountType(data.type)) return jsonError(Error.INVALID_ACCOUNT_TYPE);
 
 	let results = await DB.prepare('SELECT * FROM "Accounts" WHERE "Username" = ?', [data.username]);
-	if (results === null) return jsonError(2000);
-	if (results.length !== 0) return jsonError(1007);
+	if (results === null) return jsonError(Error.UNKNOWN_ERROR);
+	if (results.length !== 0) return jsonError(Error.USERNAME_ALREADY_REGISTERED);
 
 	data.password = await Bun.password.hash(data.password, {
 		algorithm: "argon2id",
@@ -46,7 +47,7 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 			timestamp,
 		]
 	);
-	if (!result) return jsonError(2000);
+	if (!result) return jsonError(Error.UNKNOWN_ERROR);
 
 	return jsonResponse({ error: 0, info: "Success" });
 }

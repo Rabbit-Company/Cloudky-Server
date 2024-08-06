@@ -3,15 +3,16 @@ import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
 import Metrics from "../../../metrics";
+import { Error } from "../../../errors";
 
 export default async function handleFileDelete(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "POST") return jsonError(404);
+	if (req.method !== "POST") return jsonError(Error.INVALID_ENDPOINT);
 
 	let data: any;
 	try {
 		data = await req.json();
 	} catch {
-		return jsonError(1001);
+		return jsonError(Error.REQUIRED_DATA_MISSING);
 	}
 
 	const { user, error } = await authenticateUser(req, ip);
@@ -22,7 +23,7 @@ export default async function handleFileDelete(req: Request, match: MatchedRoute
 	}
 
 	let res = await Storage.deleteUserFiles(user, data.paths);
-	if (res === false) return jsonError(2000);
+	if (res === false) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${user}`);
 

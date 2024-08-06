@@ -1,3 +1,33 @@
+export enum Error {
+	INVALID_ENDPOINT = 404,
+	BEARER_TOKEN_MISSING = 1000,
+	REQUIRED_DATA_MISSING = 1001,
+	REGISTRATION_DISABLED = 1002,
+	INVALID_USERNAME_FORMAT = 1003,
+	PASSWORD_NOT_HASHED = 1004,
+	INVALID_FILE_NAME = 1005,
+	INVALID_FILE = 1006,
+	USERNAME_ALREADY_REGISTERED = 1007,
+	INVALID_API_SECRET_KEY = 1008,
+	INVALID_EMAIL = 1009,
+	MAX_FILE_SIZE_EXCEEDED = 1010,
+	MISSING_AUTHORIZATION_HEADER = 1011,
+	INVALID_USERNAME = 1012,
+	INVALID_PASSWORD = 1013,
+	INCORRECT_PASSWORD = 1014,
+	REDIS_CONNECTION_ERROR = 1015,
+	INVALID_TOKEN = 1016,
+	TOKEN_EXPIRED = 1017,
+	MISSING_USERNAME_AND_TOKEN = 1018,
+	INVALID_ACCOUNT_TYPE = 1019,
+	INVALID_UPLOAD_ID = 1020,
+	INVALID_EXPIRATION_TIMESTAMP = 1021,
+	NON_EXISTENT_SHARE_LINK = 1022,
+	INVALID_SHARE_LINK = 1023,
+	UNKNOWN_ERROR = 2000,
+	INSUFFICIENT_PERMISSIONS = 9999,
+}
+
 namespace Errors {
 	export const list: { [key: number]: { message: string; httpCode: number } } = {
 		404: { message: "Invalid API endpoint", httpCode: 404 },
@@ -29,11 +59,11 @@ namespace Errors {
 		9999: { message: "Your do not have permission to perform this action.", httpCode: 403 },
 	};
 
-	export function get(id: number) {
+	export function get(id: Error) {
 		return list[id];
 	}
 
-	export function getJson(id: number) {
+	export function getJson(id: Error) {
 		return { error: id, info: list[id].message };
 	}
 }

@@ -2,9 +2,10 @@ import type { MatchedRoute } from "bun";
 import DB from "../../../database/database";
 import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
 import Metrics from "../../../metrics";
+import { Error } from "../../../errors";
 
 export default async function handleShareLinkList(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "GET") return jsonError(404);
+	if (req.method !== "GET") return jsonError(Error.INVALID_ENDPOINT);
 
 	const { user, error } = await authenticateUser(req, ip);
 	if (error) return error;
@@ -28,7 +29,7 @@ export default async function handleShareLinkList(req: Request, match: MatchedRo
 		`,
 		[user]
 	);
-	if (!results) return jsonError(2000);
+	if (!results) return jsonError(Error.UNKNOWN_ERROR);
 
 	return jsonResponse({ error: 0, info: "Success", links: results });
 }

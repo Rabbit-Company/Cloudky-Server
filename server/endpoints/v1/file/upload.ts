@@ -5,6 +5,7 @@ import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
 import S3 from "../../../storage/s3storage";
 import Metrics from "../../../metrics";
+import { Error } from "../../../errors";
 
 export default async function handleFileUpload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	const { user, error } = await authenticateUser(req, ip);
@@ -19,7 +20,7 @@ export default async function handleFileUpload(req: Request, match: MatchedRoute
 	} else if (req.method === "PUT" && process.env.S3_ENABLED !== "true") {
 		return await localFileUpload(req, user);
 	} else {
-		return jsonError(404);
+		return jsonError(Error.INVALID_ENDPOINT);
 	}
 }
 
@@ -28,29 +29,29 @@ async function s3FileUpload(req: Request, username: string): Promise<Response> {
 	try {
 		data = await req.json();
 	} catch {
-		return jsonError(1001);
+		return jsonError(Error.REQUIRED_DATA_MISSING);
 	}
 
-	if (!Validate.userFilePathName(data.path)) return jsonError(1005);
+	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
 
 	let res = await S3.getUserMultipartUploadLink(username, data.path);
-	if (res === null) return jsonError(2000);
+	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 	return jsonResponse({ error: 0, info: "Success", link: res });
 }
 
 async function localFileUpload(req: Request, username: string): Promise<Response> {
 	const contentLength = req.headers.get("Content-Length");
 	if (contentLength && parseInt(contentLength, 10) > 53_687_091_200) {
-		return jsonError(1010);
+		return jsonError(Error.MAX_FILE_SIZE_EXCEEDED);
 	}
 
 	const formdata = await req.formData();
 	const key = formdata.get("name")?.toString();
 	const file = formdata.get("file");
 
-	if (!Validate.userFilePathName(key)) return jsonError(1005);
+	if (!Validate.userFilePathName(key)) return jsonError(Error.INVALID_FILE_NAME);
 	if (!(file instanceof File) || file.size === 0) {
-		return jsonError(1006);
+		return jsonError(Error.INVALID_FILE);
 	}
 
 	const fileSizeInBytes = file.size || 0;
@@ -58,11 +59,11 @@ async function localFileUpload(req: Request, username: string): Promise<Response
 
 	// 50GB max file size
 	if (fileSizeInMB > 51_200) {
-		return jsonError(1010);
+		return jsonError(Error.MAX_FILE_SIZE_EXCEEDED);
 	}
 
 	let res = await Storage.uploadUserFile(username, key!, file);
-	if (res === null) return jsonError(2000);
+	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${username}`);
 

@@ -6,6 +6,7 @@ import Validate from "./validate.ts";
 import { saveChunk, type ChunkData, buildChunks } from "./chunks.ts";
 import Metrics from "./metrics.ts";
 import { generateHash, jsonError } from "./utils.ts";
+import { Error } from "./errors.ts";
 
 await Redis.initialize();
 await DB.initialize();
@@ -51,7 +52,7 @@ export const httpServer = Bun.serve({
 
 		const start = process.hrtime();
 		const match = router.match(path);
-		if (!match) return jsonError(404);
+		if (!match) return jsonError(Error.INVALID_ENDPOINT);
 
 		const { src } = match;
 
@@ -73,7 +74,7 @@ export const httpServer = Bun.serve({
 			return res;
 		} catch (err) {
 			Logger.error(`[GENERAL] ${err}`);
-			return jsonError(2000);
+			return jsonError(Error.UNKNOWN_ERROR);
 		}
 	},
 });
@@ -102,15 +103,15 @@ if (process.env.S3_ENABLED !== "true") {
 
 			Logger.http(`WebSocket - ${ip} - ${username}`);
 
-			if (!Validate.username(username)) return jsonError(1012);
-			if (!Validate.token(token)) return jsonError(1016);
-			if (!Validate.uuid(uploadID)) return jsonError(1020);
-			if (!Validate.userFilePathName(path)) return jsonError(1005);
+			if (!Validate.username(username)) return jsonError(Error.INVALID_USERNAME);
+			if (!Validate.token(token)) return jsonError(Error.INVALID_TOKEN);
+			if (!Validate.uuid(uploadID)) return jsonError(Error.INVALID_UPLOAD_ID);
+			if (!Validate.userFilePathName(path)) return jsonError(Error.INVALID_FILE_NAME);
 
 			let hashedIP = await generateHash(ip || "", "sha256");
 			let token2 = await Redis.getString(`token_${username}_${hashedIP}`);
-			if (!Validate.token(token2)) return jsonError(1017);
-			if (token !== token2) return jsonError(1017);
+			if (!Validate.token(token2)) return jsonError(Error.TOKEN_EXPIRED);
+			if (token !== token2) return jsonError(Error.TOKEN_EXPIRED);
 
 			let chunkData: ChunkData = {
 				owner: username as string,
@@ -130,7 +131,7 @@ if (process.env.S3_ENABLED !== "true") {
 
 			if (server.upgrade(req, { data })) return;
 
-			return jsonError(2000);
+			return jsonError(Error.UNKNOWN_ERROR);
 		},
 		websocket: {
 			idleTimeout: 120,
