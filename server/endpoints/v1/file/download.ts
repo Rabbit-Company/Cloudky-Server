@@ -3,6 +3,7 @@ import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
 import S3 from "../../../storage/s3storage";
 import LocalStorage from "../../../storage/localstorage";
 import Metrics from "../../../metrics";
+import Validate from "../../../validate";
 
 export default async function handleFileDownload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if (req.method !== "POST") return jsonError(404);
@@ -20,6 +21,8 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	if (Number(process.env.METRICS_TYPE) >= 3) {
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
 	}
+
+	if (!Validate.userFilePathName(data.path)) return jsonError(1005);
 
 	if (process.env.S3_ENABLED === "true") {
 		let res = await S3.getUserObjectLink(user, data.path);

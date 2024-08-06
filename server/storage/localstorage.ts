@@ -68,6 +68,18 @@ namespace LocalStorage {
 		}
 	}
 
+	export async function renameUserFile(username: string, key: string, destination: string): Promise<boolean> {
+		try {
+			key = `${process.env.DATA_DIRECTORY}/data/${username}/${key}`;
+			destination = `${process.env.DATA_DIRECTORY}/data/${username}/${destination}`;
+			await mkdir(path.dirname(destination), { recursive: true });
+			await rename(key, destination);
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
 	export async function deleteUserFiles(username: string, keys: string[]): Promise<boolean> {
 		try {
 			const dirPath = `${process.env.DATA_DIRECTORY}/data/${username}`;

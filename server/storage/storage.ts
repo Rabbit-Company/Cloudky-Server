@@ -23,6 +23,13 @@ namespace Storage {
 		return await LocalStorage.moveUserFiles(username, keys, destination);
 	}
 
+	export async function renameUserFile(username: string, key: string, destination: string) {
+		if (process.env.S3_ENABLED === "true") {
+			return false;
+		}
+		return await LocalStorage.renameUserFile(username, key, destination);
+	}
+
 	export async function deleteUserFiles(username: string, keys: string[]) {
 		if (process.env.S3_ENABLED === "true") {
 			return await S3.deleteUserFiles(username, keys);

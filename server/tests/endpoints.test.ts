@@ -76,13 +76,25 @@ describe("endpoints", () => {
 		expect(data?.error).toBe(0);
 	});
 
+	test("file rename", async () => {
+		const res = await fetch("http://0.0.0.0:8085/v1/file/rename", {
+			method: "POST",
+			headers: {
+				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
+			},
+			body: JSON.stringify({ path: "test.txt", destination: "test2.txt" }),
+		});
+		const data = (await res.json()) as { error: number; info: string };
+		expect(data?.error).toBe(0);
+	});
+
 	test("file move", async () => {
 		const res = await fetch("http://0.0.0.0:8085/v1/file/move", {
 			method: "POST",
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
-			body: JSON.stringify({ files: ["test.txt"], destination: "test/" }),
+			body: JSON.stringify({ files: ["test2.txt"], destination: "test/" }),
 		});
 		const data = (await res.json()) as { error: number; info: string };
 		expect(data?.error).toBe(0);
@@ -94,7 +106,7 @@ describe("endpoints", () => {
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
-			body: JSON.stringify({ path: "test/test.txt" }),
+			body: JSON.stringify({ path: "test/test2.txt" }),
 		});
 		let fileContent = await res.text();
 		expect(fileContent).toBe("Hello World!");
@@ -106,7 +118,7 @@ describe("endpoints", () => {
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
-			body: JSON.stringify({ path: "test/test.txt", password: null, expiration: null }),
+			body: JSON.stringify({ path: "test/test2.txt", password: null, expiration: null }),
 		});
 		const data = (await res.json()) as { error: number; info: string };
 		expect(data?.error).toBe(0);
@@ -142,7 +154,7 @@ describe("endpoints", () => {
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
-			body: JSON.stringify({ paths: ["test/test.txt"] }),
+			body: JSON.stringify({ paths: ["test/test2.txt"] }),
 		});
 		const data = (await res.json()) as { error: number; info: string };
 		expect(data?.error).toBe(0);
