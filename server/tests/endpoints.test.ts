@@ -51,7 +51,7 @@ describe("endpoints", () => {
 	test("file upload", async () => {
 		const formData = new FormData();
 		formData.append("name", "test.txt");
-		formData.append("file", new Blob(["Hello World!"], { type: "text/xml" }));
+		formData.append("file", new Blob(["Hello World!"], { type: "text/plain" }));
 
 		const res = await fetch("http://0.0.0.0:8085/v1/file/upload", {
 			method: "PUT",
