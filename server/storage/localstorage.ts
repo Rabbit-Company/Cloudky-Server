@@ -4,6 +4,7 @@ import type { FileInformation } from "./storage";
 import type { BunFile } from "bun";
 import { mkdir, unlink, rename, readdir, rm } from "fs/promises";
 import path from "node:path";
+import DB from "../database/database";
 
 namespace LocalStorage {
 	export async function listUserFiles(username: string): Promise<FileInformation[]> {
@@ -48,6 +49,16 @@ namespace LocalStorage {
 		try {
 			let file = Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`);
 			if (!(await file.exists())) return null;
+
+			let results: any = await DB.prepare(`SELECT "DownloadUsed", "DownloadLimit" FROM "Accounts" WHERE "Username" = ?`, [username]);
+			if (results === null || results.length !== 1) return null;
+
+			const downloadUsed = file.size + results[0].DownloadUsed;
+			if (downloadUsed > results[0].DownloadLimit) return null;
+
+			let result2 = await DB.prepareModify('UPDATE "Accounts" SET "DownloadUsed" = ? WHERE "Username" = ?', [downloadUsed, username]);
+			if (!result2) return null;
+
 			return file;
 		} catch {
 			return null;

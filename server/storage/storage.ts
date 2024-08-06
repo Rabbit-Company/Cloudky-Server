@@ -56,7 +56,7 @@ namespace Storage {
 		files.forEach((file) => {
 			storageUsed += file.Size;
 		});
-		return storageUsed / (1024 * 1024);
+		return storageUsed;
 	}
 }
 
