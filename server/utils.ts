@@ -74,6 +74,25 @@ export function generateRandomText(length: number): string {
 	return apiKey;
 }
 
+function toBuffer(input: string | Buffer | Uint8Array): Buffer | Uint8Array {
+	if (typeof input === "string") return Buffer.from(input);
+	return input;
+}
+
+export function timingSafeEqual(a: string | Buffer | Uint8Array, b: string | Buffer | Uint8Array): boolean {
+	const bufA = toBuffer(a);
+	const bufB = toBuffer(b);
+
+	if (bufA.length !== bufB.length) return false;
+
+	let result = 0;
+	for (let i = 0; i < bufA.length; i++) {
+		result |= bufA[i] ^ bufB[i];
+	}
+
+	return result === 0;
+}
+
 export async function authenticateUser(req: Request, ip: string | undefined): Promise<{ user: string; error: Response | null }> {
 	const auth = basicAuthentication(req);
 	if (auth === null) return { user: "", error: jsonError(Error.MISSING_USERNAME_AND_TOKEN) };
@@ -84,7 +103,7 @@ export async function authenticateUser(req: Request, ip: string | undefined): Pr
 	let hashedIP = await generateHash(ip || "", "sha256");
 	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
 	if (!Validate.token(token)) return { user: "", error: jsonError(Error.TOKEN_EXPIRED) };
-	if (auth.pass !== token) return { user: "", error: jsonError(Error.TOKEN_EXPIRED) };
+	if (!timingSafeEqual(auth.pass, token as string)) return { user: "", error: jsonError(Error.TOKEN_EXPIRED) };
 
 	return { user: auth.user, error: null };
 }
