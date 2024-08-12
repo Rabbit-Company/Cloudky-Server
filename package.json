@@ -1,46 +1,46 @@
 {
-  "name": "cloudky-server",
-  "version": "1.0.0",
-  "description": "Self-hosted file sharing server",
-  "module": "index.ts",
-  "type": "module",
-  "scripts": {
-    "start": "bun run server/index.ts",
+	"name": "cloudky-server",
+	"version": "1.0.0",
+	"description": "Self-hosted file sharing server",
+	"module": "index.ts",
+	"type": "module",
+	"scripts": {
+		"start": "bun run server/index.ts",
 		"test": "bun test",
-    "watch": "bun --watch server/index.ts",
-    "build": "bun build server/index.ts --compile --minify --outfile ./cloudky-server"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Rabbit-Company/Cloudky-Server.git"
-  },
-  "keywords": [
-    "cloudky",
-    "cloud",
-    "file",
-    "sharing"
-  ],
-  "author": "Rabbit Company",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/Rabbit-Company/Cloudky-Server/issues"
-  },
-  "homepage": "https://github.com/Rabbit-Company/Cloudky-Server#readme",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.623.0",
-    "@aws-sdk/s3-request-presigner": "^3.623.0",
-    "@rabbit-company/blake2b": "^2.0.0",
-    "@rabbit-company/logger": "^3.1.0",
-    "d1-api": "^0.1.0",
-    "ioredis": "^5.4.1",
-    "mariadb": "^3.3.1",
-    "mysql2": "^3.11.0",
-    "prom-client": "^15.1.3"
-  }
+		"watch": "bun --watch server/index.ts",
+		"build": "bun build server/index.ts --compile --minify --outfile ./cloudky-server"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Rabbit-Company/Cloudky-Server.git"
+	},
+	"keywords": [
+		"cloudky",
+		"cloud",
+		"file",
+		"sharing"
+	],
+	"author": "Rabbit Company",
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/Rabbit-Company/Cloudky-Server/issues"
+	},
+	"homepage": "https://github.com/Rabbit-Company/Cloudky-Server#readme",
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"@aws-sdk/client-s3": "^3.627.0",
+		"@aws-sdk/s3-request-presigner": "^3.627.0",
+		"@rabbit-company/blake2b": "^2.0.0",
+		"@rabbit-company/logger": "npm:@jsr/rabbit-company__logger@4.0.0",
+		"d1-api": "^0.1.0",
+		"ioredis": "^5.4.1",
+		"mariadb": "^3.3.1",
+		"mysql2": "^3.11.0",
+		"prom-client": "^15.1.3"
+	}
 }
