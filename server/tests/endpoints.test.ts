@@ -1,10 +1,11 @@
 import { expect, test, describe } from "bun:test";
 import type { FileInformation } from "../storage/storage";
 import type { ShareLinks } from "../sharelinks/sharelinks";
+import Blake2b from "@rabbit-company/blake2b";
 
 const username = "test";
 const email = "test@test.com";
-const password = "a71079d42853dea26e453004338670a53814b78137ffbed07603a41d76a483aa9bc33b582f77d30a65e6f29a896c0411f38312e1d66e0bf16386c86a89bea572";
+const password = Blake2b.hash("P@ssword123");
 
 let token = "";
 let files: FileInformation[] = [];
@@ -155,6 +156,17 @@ describe("endpoints", () => {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
 			body: JSON.stringify({ paths: ["test/test2.txt"] }),
+		});
+		const data = (await res.json()) as { error: number; info: string };
+		expect(data?.error).toBe(0);
+	});
+
+	test("account delete", async () => {
+		const res = await fetch("http://0.0.0.0:8085/v1/account/delete", {
+			method: "POST",
+			headers: {
+				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
+			},
 		});
 		const data = (await res.json()) as { error: number; info: string };
 		expect(data?.error).toBe(0);
