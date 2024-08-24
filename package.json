@@ -27,15 +27,15 @@
 	},
 	"homepage": "https://github.com/Rabbit-Company/Cloudky-Server#readme",
 	"devDependencies": {
-		"@types/bun": "latest"
+		"@types/bun": "^1.1.7"
 	},
 	"peerDependencies": {
-		"typescript": "^5.0.0"
+		"typescript": "^5.5.4"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.627.0",
-		"@aws-sdk/s3-request-presigner": "^3.627.0",
-		"@rabbit-company/blake2b": "npm:@jsr/rabbit-company__blake2b",
+		"@aws-sdk/client-s3": "^3.637.0",
+		"@aws-sdk/s3-request-presigner": "^3.637.0",
+		"@rabbit-company/blake2b": "npm:@jsr/rabbit-company__blake2b@2.1.0",
 		"@rabbit-company/logger": "npm:@jsr/rabbit-company__logger@4.0.0",
 		"d1-api": "^0.1.0",
 		"ioredis": "^5.4.1",
