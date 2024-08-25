@@ -2,28 +2,51 @@ import type { ResultSetHeader } from "mysql2/promise";
 import MySQL from "./mysql";
 import SQLite from "./sqlite";
 import MariaDB from "./mariadb";
+import Postgres from "./postgres";
 import D1 from "./d1";
 import Logger from "@rabbit-company/logger";
 
 namespace DB {
 	export async function initialize() {
-		if (process.env.DB_TYPE === "mariadb") {
-			await MariaDB.initialize();
-		} else if (process.env.DB_TYPE === "mysql") {
-			await MySQL.initialize();
-		} else if (process.env.DB_TYPE === "sqlite") {
-			SQLite.initialize();
-		} else if (process.env.DB_TYPE === "d1") {
-			await D1.initialize();
-		} else {
-			Logger.error(`[DB] Unsupported database type: ${process.env.DB_TYPE}`);
-			process.exit();
+		const dbType = process.env.DB_TYPE;
+
+		Logger.info(`[DB] Initializing ${dbType} database...`);
+
+		try {
+			switch (dbType) {
+				case "postgres":
+					await Postgres.initialize();
+					break;
+				case "mariadb":
+					await MariaDB.initialize();
+					break;
+				case "mysql":
+					await MySQL.initialize();
+					break;
+				case "sqlite":
+					SQLite.initialize();
+					break;
+				case "d1":
+					await D1.initialize();
+					break;
+				default:
+					Logger.error(`[DB] Unsupported database type: ${dbType}`);
+					process.exit(1);
+			}
+		} catch (error) {
+			Logger.error(`[DB] Failed to initialize ${dbType} database: ${error}`);
+			process.exit(1);
 		}
+
+		Logger.info(`[DB] Database successfully initialized.`);
 	}
 
 	export async function prepare(query: string, values: any[]): Promise<any[] | null> {
 		try {
-			if (process.env.DB_TYPE === "mariadb") {
+			if (process.env.DB_TYPE === "postgres") {
+				const results = await Postgres.connection.query(query, values);
+				return results.rows;
+			} else if (process.env.DB_TYPE === "mariadb") {
 				const results: any[] = await MariaDB.connection.query(query, values);
 				return results;
 			} else if (process.env.DB_TYPE === "mysql") {
@@ -46,7 +69,10 @@ namespace DB {
 
 	export async function prepareModify(query: string, values: any[]): Promise<boolean | null> {
 		try {
-			if (process.env.DB_TYPE === "mariadb") {
+			if (process.env.DB_TYPE === "postgres") {
+				const res = await Postgres.connection.query(query, values);
+				return (res.rowCount || 0) > 0;
+			} else if (process.env.DB_TYPE === "mariadb") {
 				const res = await MariaDB.connection.query(query, values);
 				return res.affectedRows > 0;
 			} else if (process.env.DB_TYPE === "mysql") {

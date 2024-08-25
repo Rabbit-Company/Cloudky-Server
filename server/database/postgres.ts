@@ -1,20 +1,14 @@
-import mysql, { type Pool } from "mysql2/promise";
+import { Client } from "pg";
 import DB from "./database";
 
-namespace MySQL {
-	export const connection: Pool = mysql.createPool({
-		host: process.env.MYSQL_HOST,
-		port: Number(process.env.MYSQL_PORT || 3306),
-		database: process.env.MYSQL_DATABASE,
-		user: process.env.MYSQL_USER,
-		password: process.env.MYSQL_PASSWORD,
-		waitForConnections: true,
-		connectionLimit: 10,
-		maxIdle: 10,
-		idleTimeout: 0,
-		queueLimit: 0,
-		enableKeepAlive: true,
-		keepAliveInitialDelay: 0,
+namespace Postgres {
+	export const connection = new Client({
+		host: process.env.POSTGRES_HOST,
+		port: Number(process.env.POSTGRES_PORT) || 5432,
+		database: process.env.POSTGRES_DATABASE,
+		user: process.env.POSTGRES_USER,
+		password: process.env.POSTGRES_PASSWORD,
+		keepAlive: true,
 	});
 
 	export async function initialize() {
@@ -33,7 +27,7 @@ namespace MySQL {
 					"DownloadLimit" BIGINT NOT NULL,
 					"UploadUsed" BIGINT NOT NULL,
 					"UploadLimit" BIGINT NOT NULL,
-					"Type" INT NOT NULL,
+					"Type" INTEGER NOT NULL,
 					"Created" BIGINT NOT NULL,
 					"Accessed" BIGINT NOT NULL
 				);
@@ -44,7 +38,7 @@ namespace MySQL {
 					"Username" VARCHAR(30) NOT NULL,
 					"Size" BIGINT,
 					"Modified" BIGINT,
-					UNIQUE idx_path_username ("Path", "Username")
+					CONSTRAINT "idx_path_username" UNIQUE ("Path", "Username")
 				);
 
 				CREATE TABLE IF NOT EXISTS "ShareLinks"(
@@ -52,13 +46,14 @@ namespace MySQL {
 					"Path" VARCHAR(4096) NOT NULL,
 					"Username" VARCHAR(30) NOT NULL,
 					"Password" VARCHAR(255),
-					"Downloaded" INT NOT NULL,
+					"Downloaded" INTEGER NOT NULL,
 					"Expiration" BIGINT,
 					"Created" BIGINT NOT NULL,
-					"Accessed" BIGINT NOT NULL,
-					INDEX idx_expiration ("Expiration"),
-					INDEX idx_path_username ("Path", "Username")
+					"Accessed" BIGINT NOT NULL
 				);
+
+				CREATE INDEX IF NOT EXISTS idx_expiration ON "ShareLinks" ("Expiration");
+				CREATE INDEX IF NOT EXISTS idx_path_username ON "ShareLinks" ("Path", "Username");
 			`,
 			[]
 		);
@@ -67,4 +62,4 @@ namespace MySQL {
 	}
 }
 
-export default MySQL;
+export default Postgres;

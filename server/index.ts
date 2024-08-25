@@ -16,7 +16,7 @@ Metrics.initialize();
 
 Logger.level = Number(process.env.LOGGER_LEVEL) || 3;
 
-Logger.info(`Server listening on port ${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}`);
+Logger.info(`[HS] HTTP Server listening on port ${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}`);
 
 const router = new Bun.FileSystemRouter({
 	style: "nextjs",
@@ -86,7 +86,7 @@ if (process.env.S3_ENABLED !== "true") {
 		chunkData: ChunkData;
 	};
 
-	Logger.info(`WebSocket listening on port ${process.env.SERVER_HOSTNAME}:${process.env.WEBSOCKET_PORT}`);
+	Logger.info(`[WS] WebSocket listening on port ${process.env.SERVER_HOSTNAME}:${process.env.WEBSOCKET_PORT}`);
 
 	Bun.serve<WebSocketData>({
 		port: process.env.WEBSOCKET_PORT,
@@ -101,7 +101,7 @@ if (process.env.S3_ENABLED !== "true") {
 			const uploadID = url.searchParams.get("uploadID");
 			const path = url.searchParams.get("path");
 
-			Logger.http(`WebSocket - ${ip} - ${username}`);
+			Logger.http(`[WS] WebSocket - ${ip} - ${username}`);
 
 			if (!Validate.username(username)) return jsonError(Error.INVALID_USERNAME);
 			if (!Validate.token(token)) return jsonError(Error.INVALID_TOKEN);

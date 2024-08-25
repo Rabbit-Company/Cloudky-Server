@@ -10,7 +10,7 @@ namespace SQLite {
 				"Username" TEXT PRIMARY KEY,
 				"Email" TEXT NOT NULL,
 				"Password" TEXT NOT NULL,
-				"2faSecret" TEXT,
+				"TwoFaSecret" TEXT,
 				"YubicoOTP" TEXT,
 				"BackupCodes" TEXT,
 				"StorageUsed" INTEGER NOT NULL,
