@@ -1,6 +1,6 @@
 {
 	"name": "cloudky-server",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"description": "Self-hosted file sharing server",
 	"module": "index.ts",
 	"type": "module",
@@ -28,7 +28,7 @@
 	"homepage": "https://github.com/Rabbit-Company/Cloudky-Server#readme",
 	"devDependencies": {
 		"@types/bun": "^1.1.8",
-		"@types/pg": "^8.11.6"
+		"@types/pg": "^8.11.8"
 	},
 	"peerDependencies": {
 		"typescript": "^5.5.4"
