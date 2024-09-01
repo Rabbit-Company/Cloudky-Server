@@ -24,6 +24,7 @@ export enum Error {
 	INVALID_EXPIRATION_TIMESTAMP = 1021,
 	NON_EXISTENT_SHARE_LINK = 1022,
 	INVALID_SHARE_LINK = 1023,
+	INVALID_OTP = 1024,
 	UNKNOWN_ERROR = 2000,
 	INSUFFICIENT_PERMISSIONS = 9999,
 }
@@ -55,6 +56,7 @@ namespace Errors {
 		1021: { message: "Provided expiration timestamp is invalid.", httpCode: 400 },
 		1022: { message: "Share Link can not be created on non-existing file or folder.", httpCode: 400 },
 		1023: { message: "Provided share link is invalid.", httpCode: 400 },
+		1024: { message: "Provided OTP is invalid.", httpCode: 400 },
 		2000: { message: "Something went wrong while trying to perform this action. Please try again later.", httpCode: 500 },
 		9999: { message: "Your do not have permission to perform this action.", httpCode: 403 },
 	};
