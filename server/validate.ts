@@ -1,6 +1,8 @@
 namespace Validate {
 	export function username(username: string | null | undefined): boolean {
 		if (typeof username !== "string") return false;
+		if (["null", "com1", "lpt1", "admin"].includes(username)) return false;
+		if (username.includes("--")) return false;
 		return /^([a-z][a-z0-9\-]{3,29})$/.test(username);
 	}
 
