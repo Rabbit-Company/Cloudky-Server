@@ -6,7 +6,7 @@ import { Error } from "../../../errors";
 import Storage from "../../../storage/storage";
 
 export default async function handleAccountDelete(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "POST") return jsonError(Error.INVALID_ENDPOINT);
+	if (req.method !== "DELETE") return jsonError(Error.INVALID_ENDPOINT);
 
 	const { user, error } = await authenticateUser(req, ip);
 	if (error) return error;

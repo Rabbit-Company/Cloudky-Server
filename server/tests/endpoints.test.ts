@@ -139,7 +139,7 @@ describe("endpoints", () => {
 
 	test("sharelink delete", async () => {
 		const res = await fetch("http://0.0.0.0:8085/v1/sharelink/delete", {
-			method: "POST",
+			method: "DELETE",
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
@@ -151,7 +151,7 @@ describe("endpoints", () => {
 
 	test("file delete", async () => {
 		const res = await fetch("http://0.0.0.0:8085/v1/file/delete", {
-			method: "POST",
+			method: "DELETE",
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
@@ -163,7 +163,7 @@ describe("endpoints", () => {
 
 	test("account delete", async () => {
 		const res = await fetch("http://0.0.0.0:8085/v1/account/delete", {
-			method: "POST",
+			method: "DELETE",
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},

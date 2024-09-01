@@ -6,7 +6,7 @@ import Metrics from "../../../metrics";
 import { Error } from "../../../errors";
 
 export default async function handleFileDelete(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "POST") return jsonError(Error.INVALID_ENDPOINT);
+	if (req.method !== "DELETE") return jsonError(Error.INVALID_ENDPOINT);
 
 	let data: any;
 	try {
