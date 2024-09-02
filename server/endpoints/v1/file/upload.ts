@@ -67,5 +67,5 @@ async function localFileUpload(req: Request, username: string): Promise<Response
 
 	await Redis.deleteString(`filelist_${username}`);
 
-	return jsonResponse({ error: 0, info: "Success" });
+	return jsonError(Error.SUCCESS);
 }

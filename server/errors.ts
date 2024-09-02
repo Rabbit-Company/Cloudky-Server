@@ -1,4 +1,5 @@
 export enum Error {
+	SUCCESS = 0,
 	INVALID_ENDPOINT = 404,
 	BEARER_TOKEN_MISSING = 1000,
 	REQUIRED_DATA_MISSING = 1001,
@@ -31,6 +32,7 @@ export enum Error {
 
 namespace Errors {
 	export const list: { [key: number]: { message: string; httpCode: number } } = {
+		0: { message: "Success", httpCode: 200 },
 		404: { message: "Invalid API endpoint", httpCode: 404 },
 		1000: { message: "Bearer Token is missing in Authorization header.", httpCode: 401 },
 		1001: { message: "Not all required data provided in json format.", httpCode: 400 },

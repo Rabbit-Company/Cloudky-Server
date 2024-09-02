@@ -1,6 +1,6 @@
 import DB from "../../../database/database";
 import { Error } from "../../../errors";
-import { jsonError, jsonResponse } from "../../../utils";
+import { jsonError } from "../../../utils";
 import Validate from "../../../validate";
 
 export default async function handleAccountCreate(req: Request): Promise<Response> {
@@ -49,5 +49,5 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 	);
 	if (!result) return jsonError(Error.UNKNOWN_ERROR);
 
-	return jsonResponse({ error: 0, info: "Success" });
+	return jsonError(Error.SUCCESS);
 }

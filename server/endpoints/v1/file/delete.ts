@@ -1,5 +1,5 @@
 import type { MatchedRoute } from "bun";
-import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
+import { authenticateUser, jsonError } from "../../../utils";
 import Redis from "../../../database/redis";
 import Storage from "../../../storage/storage";
 import Metrics from "../../../metrics";
@@ -30,5 +30,5 @@ export default async function handleFileDelete(req: Request, match: MatchedRoute
 
 	await Redis.deleteString(`filelist_${user}`);
 
-	return jsonResponse({ error: 0, info: "Success" });
+	return jsonError(Error.SUCCESS);
 }

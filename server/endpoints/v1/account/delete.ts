@@ -1,6 +1,6 @@
 import type { MatchedRoute } from "bun";
 import DB from "../../../database/database";
-import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
+import { authenticateUser, jsonError } from "../../../utils";
 import Metrics from "../../../metrics";
 import { Error } from "../../../errors";
 import Storage from "../../../storage/storage";
@@ -34,5 +34,5 @@ export default async function handleAccountDelete(req: Request, match: MatchedRo
 	let result3 = await DB.prepareModify('DELETE FROM "Accounts" WHERE "Username" = ?', [user]);
 	if (!result3) return jsonError(Error.UNKNOWN_ERROR);
 
-	return jsonResponse({ error: 0, info: "Success" });
+	return jsonError(Error.SUCCESS);
 }

@@ -43,7 +43,7 @@ export const httpServer = Bun.serve({
 			response.headers.set("Access-Control-Allow-Origin", "*");
 			response.headers.set("Access-Control-Allow-Headers", "*");
 			response.headers.set("Access-Control-Allow-Credentials", "true");
-			response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+			response.headers.set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
 			response.headers.set("Access-Control-Max-Age", "86400");
 			return response;
 		}

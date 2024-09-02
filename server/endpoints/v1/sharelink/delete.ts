@@ -1,6 +1,6 @@
 import type { MatchedRoute } from "bun";
 import DB from "../../../database/database";
-import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
+import { authenticateUser, jsonError } from "../../../utils";
 import Validate from "../../../validate";
 import Metrics from "../../../metrics";
 import { Error } from "../../../errors";
@@ -27,5 +27,5 @@ export default async function handleShareLinkDelete(req: Request, match: Matched
 	let result = await DB.prepareModify('DELETE FROM "ShareLinks" WHERE "Token" = ? AND "Username" = ?', [data.link, user]);
 	if (!result) return jsonError(Error.UNKNOWN_ERROR);
 
-	return jsonResponse({ error: 0, info: "Success" });
+	return jsonError(Error.SUCCESS);
 }
