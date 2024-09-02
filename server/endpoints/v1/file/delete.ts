@@ -23,7 +23,7 @@ export default async function handleFileDelete(req: Request, match: MatchedRoute
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
 	}
 
-	if (!Validate.userFilePathNames(data.path)) return jsonError(Error.INVALID_FILE_NAME);
+	if (!Validate.userFilePathNames(data.paths)) return jsonError(Error.INVALID_FILE_NAME);
 
 	let res = await Storage.deleteUserFiles(user, data.paths);
 	if (res === false) return jsonError(Error.UNKNOWN_ERROR);
