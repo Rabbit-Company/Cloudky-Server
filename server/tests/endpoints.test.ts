@@ -1,6 +1,6 @@
 import { expect, test, describe } from "bun:test";
 import type { FileInformation } from "../storage/storage";
-import type { ShareLinks } from "../sharelinks/sharelinks";
+import type { ShareLink } from "../sharelink/sharelink";
 import Blake2b from "@rabbit-company/blake2b";
 
 const username = "test";
@@ -132,9 +132,18 @@ describe("endpoints", () => {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
 		});
-		const data = (await res.json()) as { error: number; info: string; links?: ShareLinks[] };
+		const data = (await res.json()) as { error: number; info: string; links?: ShareLink[] };
 		if (data.links?.length) shareLink = data.links[0].Token;
 		expect(data?.error).toBe(0);
+	});
+
+	test("sharelink download", async () => {
+		const res = await fetch("http://0.0.0.0:8085/v1/sharelink/download", {
+			method: "POST",
+			body: JSON.stringify({ link: shareLink, password: null }),
+		});
+		let fileContent = await res.text();
+		expect(fileContent).toBe("Hello World!");
 	});
 
 	test("sharelink delete", async () => {

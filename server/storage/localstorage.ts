@@ -45,7 +45,7 @@ namespace LocalStorage {
 		}
 	}
 
-	export async function downloadUserFile(username: string, key: string): Promise<BunFile | null> {
+	export async function downloadUserFile(username: string, key: string, sharelink?: string): Promise<BunFile | null> {
 		try {
 			let file = Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`);
 			if (!(await file.exists())) return null;
@@ -58,6 +58,11 @@ namespace LocalStorage {
 
 			let result2 = await DB.prepareModify('UPDATE "Accounts" SET "DownloadUsed" = ? WHERE "Username" = ?', [downloadUsed, username]);
 			if (!result2) return null;
+
+			if (sharelink) {
+				let result = await DB.prepareModify('UPDATE "ShareLinks" SET "Downloaded" = "Downloaded" + 1 WHERE "Token" = ?', [sharelink]);
+				if (!result) return null;
+			}
 
 			return file;
 		} catch {

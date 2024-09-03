@@ -1,7 +1,7 @@
-export interface ShareLinks {
+export interface ShareLink {
 	Token: string;
 	Path: string;
-	Username?: string;
+	Username: string;
 	Password: string | null;
 	Expiration: number | null;
 	Downloaded: number;
