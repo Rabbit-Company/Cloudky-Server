@@ -1,6 +1,6 @@
 import type { MatchedRoute } from "bun";
 import DB from "../../../database/database";
-import { authenticateUser, generateRandomText, jsonError } from "../../../utils";
+import { authenticateUser, generateRandomText, jsonError, jsonResponse } from "../../../utils";
 import Validate from "../../../validate";
 import Metrics from "../../../metrics";
 import LocalStorage from "../../../storage/localstorage";
@@ -38,5 +38,5 @@ export default async function handleShareLinkCreate(req: Request, match: Matched
 	);
 	if (!result) return jsonError(Error.UNKNOWN_ERROR);
 
-	return jsonError(Error.SUCCESS);
+	return jsonResponse({ error: 0, info: "Success", link: id });
 }
