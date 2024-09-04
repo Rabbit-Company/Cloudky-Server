@@ -109,7 +109,7 @@ describe("endpoints", () => {
 			},
 			body: JSON.stringify({ path: "test/test2.txt" }),
 		});
-		let fileContent = await res.text();
+		const fileContent = await res.text();
 		expect(fileContent).toBe("Hello World!");
 	});
 
@@ -142,7 +142,7 @@ describe("endpoints", () => {
 			method: "POST",
 			body: JSON.stringify({ link: shareLink, password: null }),
 		});
-		let fileContent = await res.text();
+		const fileContent = await res.text();
 		expect(fileContent).toBe("Hello World!");
 	});
 

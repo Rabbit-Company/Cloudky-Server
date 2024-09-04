@@ -39,7 +39,7 @@ export const httpServer = Bun.serve({
 		}
 
 		if (req.method === "OPTIONS") {
-			let response = new Response();
+			const response = new Response();
 			response.headers.set("Access-Control-Allow-Origin", "*");
 			response.headers.set("Access-Control-Allow-Headers", "*");
 			response.headers.set("Access-Control-Allow-Credentials", "true");
@@ -108,12 +108,12 @@ if (process.env.S3_ENABLED !== "true") {
 			if (!Validate.uuid(uploadID)) return jsonError(Error.INVALID_UPLOAD_ID);
 			if (!Validate.userFilePathName(path)) return jsonError(Error.INVALID_FILE_NAME);
 
-			let hashedIP = await generateHash(ip || "", "sha256");
-			let token2 = await Redis.getString(`token_${username}_${hashedIP}`);
+			const hashedIP = await generateHash(ip || "", "sha256");
+			const token2 = await Redis.getString(`token_${username}_${hashedIP}`);
 			if (!Validate.token(token2)) return jsonError(Error.TOKEN_EXPIRED);
 			if (token !== token2) return jsonError(Error.TOKEN_EXPIRED);
 
-			let chunkData: ChunkData = {
+			const chunkData: ChunkData = {
 				owner: username as string,
 				uploadID: uploadID as string,
 				path: path as string,
@@ -123,7 +123,7 @@ if (process.env.S3_ENABLED !== "true") {
 				created: Date.now(),
 			};
 
-			let data: WebSocketData = {
+			const data: WebSocketData = {
 				username: username as string,
 				token: token as string,
 				chunkData: chunkData,
@@ -141,7 +141,7 @@ if (process.env.S3_ENABLED !== "true") {
 			async message(ws, message) {
 				if (typeof message === "string") {
 					try {
-						let data = JSON.parse(message);
+						const data = JSON.parse(message);
 						if (!Validate.chunks(data.chunks)) return;
 						ws.data.chunkData.chunks = data.chunks;
 					} catch {}

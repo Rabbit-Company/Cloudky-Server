@@ -12,7 +12,7 @@ export interface ChunkData {
 }
 
 export async function saveChunk(chunkData: ChunkData, data: Buffer): Promise<boolean> {
-	let hash = Blake2b.hash(data);
+	const hash = Blake2b.hash(data);
 	if (!chunkData.chunks.includes(hash)) return false;
 	if (chunkData.completed.has(hash)) return false;
 

@@ -19,7 +19,7 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 	if (!Validate.password(data.password)) return jsonError(Error.PASSWORD_NOT_HASHED);
 	if (!Validate.accountType(data.type)) return jsonError(Error.INVALID_ACCOUNT_TYPE);
 
-	let results = await DB.prepare('SELECT * FROM "Accounts" WHERE "Username" = ?', [data.username]);
+	const results = await DB.prepare('SELECT * FROM "Accounts" WHERE "Username" = ?', [data.username]);
 	if (results === null) return jsonError(Error.UNKNOWN_ERROR);
 	if (results.length !== 0) return jsonError(Error.USERNAME_ALREADY_REGISTERED);
 
@@ -29,8 +29,8 @@ export default async function handleAccountCreate(req: Request): Promise<Respons
 		timeCost: 1,
 	});
 
-	let timestamp = Date.now();
-	let result = await DB.prepareModify(
+	const timestamp = Date.now();
+	const result = await DB.prepareModify(
 		'INSERT INTO "Accounts"("Username","Email","Password","StorageUsed","StorageLimit","DownloadUsed","DownloadLimit","UploadUsed","UploadLimit","Type","Created","Accessed") VALUES(?,?,?,?,?,?,?,?,?,?,?,?)',
 		[
 			data.username,

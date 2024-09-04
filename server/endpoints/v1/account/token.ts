@@ -15,22 +15,22 @@ export default async function handleAccountToken(req: Request, match: MatchedRou
 	if (!Validate.username(auth.user)) return jsonError(Error.INVALID_USERNAME);
 	if (!Validate.password(auth.pass)) return jsonError(Error.INVALID_PASSWORD);
 
-	let result = await DB.prepare('SELECT "Password" FROM "Accounts" WHERE "Username" = ?', [auth.user]);
+	const result = await DB.prepare('SELECT "Password" FROM "Accounts" WHERE "Username" = ?', [auth.user]);
 	if (result === null) return jsonError(Error.UNKNOWN_ERROR);
 	if (result.length !== 1) return jsonError(Error.INVALID_USERNAME);
 
 	if (!(await Bun.password.verify(auth.pass, result[0].Password))) return jsonError(Error.INCORRECT_PASSWORD);
 
-	let hashedIP = await generateHash(ip || "", "sha256");
-	let newToken = generateRandomText(128);
-	let token = await Redis.getOrSetString(`token_${auth.user}_${hashedIP}`, newToken, 60, 3600);
+	const hashedIP = await generateHash(ip || "", "sha256");
+	const newToken = generateRandomText(128);
+	const token = await Redis.getOrSetString(`token_${auth.user}_${hashedIP}`, newToken, 60, 3600);
 	if (token === null) return jsonError(Error.REDIS_CONNECTION_ERROR);
 
 	if (Number(process.env.METRICS_TYPE) >= 3) {
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, auth.user).inc();
 	}
 
-	let timestamp = Date.now();
+	const timestamp = Date.now();
 	await DB.prepare('UPDATE "Accounts" SET "Accessed" = ? WHERE "Username" = ?', [timestamp, auth.user]);
 
 	return jsonResponse({ error: 0, info: "Success", token: token });

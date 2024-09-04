@@ -24,7 +24,7 @@ export default async function handleShareLinkDelete(req: Request, match: Matched
 
 	if (!Validate.sharelink(data.link)) return jsonError(Error.INVALID_SHARE_LINK);
 
-	let result = await DB.prepareModify('DELETE FROM "ShareLinks" WHERE "Token" = ? AND "Username" = ?', [data.link, user]);
+	const result = await DB.prepareModify('DELETE FROM "ShareLinks" WHERE "Token" = ? AND "Username" = ?', [data.link, user]);
 	if (!result) return jsonError(Error.UNKNOWN_ERROR);
 
 	return jsonError(Error.SUCCESS);

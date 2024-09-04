@@ -12,7 +12,7 @@ namespace Postgres {
 	});
 
 	export async function initialize() {
-		let res = await DB.prepareModify(
+		const res = await DB.prepareModify(
 			`
 				CREATE TABLE IF NOT EXISTS "Accounts"(
 					"Username" VARCHAR(30) PRIMARY KEY,

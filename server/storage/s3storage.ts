@@ -26,7 +26,7 @@ namespace S3 {
 
 	export async function listObjects(prefix: string = "/", startAfter: string | undefined = undefined): Promise<_Object[] | boolean | null> {
 		try {
-			let res = await S3.send(
+			const res = await S3.send(
 				new ListObjectsV2Command({
 					Bucket: process.env.S3_BUCKET_NAME,
 					Delimiter: "/",
@@ -46,7 +46,7 @@ namespace S3 {
 
 	export async function userFileExists(username: string, key: string): Promise<boolean | null> {
 		try {
-			let results = await DB.prepare('SELECT * FROM "Files" WHERE "Username" = ? AND "Path" = ?', [username, key]);
+			const results = await DB.prepare('SELECT * FROM "Files" WHERE "Username" = ? AND "Path" = ?', [username, key]);
 			return results !== null && results.length > 0;
 		} catch (err) {
 			Logger.error(`[S3] ${err}`);
@@ -56,7 +56,7 @@ namespace S3 {
 
 	export async function deleteObjects(keys: string[]): Promise<boolean> {
 		try {
-			let res = await S3.send(
+			const res = await S3.send(
 				new DeleteObjectsCommand({
 					Bucket: process.env.S3_BUCKET_NAME,
 					Delete: {
@@ -176,17 +176,17 @@ namespace S3 {
 	}
 
 	export async function listUserFiles(username: string): Promise<FileInformation[] | null> {
-		let files: _Object[] = [];
+		const files: _Object[] = [];
 		let lastKey: string | undefined;
 		while (true) {
-			let res = await listObjects(`data/${username}/`, lastKey);
+			const res = await listObjects(`data/${username}/`, lastKey);
 			if (res === null) return null;
 			if (res === false || res === true) break;
 			files.push(...res);
 			lastKey = files[files.length - 1].Key;
 		}
 
-		let ufiles = files
+		const ufiles = files
 			.filter((file) => file.Key !== undefined && file.Size !== undefined && file.LastModified !== undefined)
 			.map(({ Key, LastModified, Size }) => ({
 				Key: Key!.replace(`data/${username}/`, ""),

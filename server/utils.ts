@@ -100,8 +100,8 @@ export async function authenticateUser(req: Request, ip: string | undefined): Pr
 	if (!Validate.username(auth.user)) return { user: "", error: jsonError(Error.INVALID_USERNAME) };
 	if (!Validate.token(auth.pass)) return { user: "", error: jsonError(Error.INVALID_TOKEN) };
 
-	let hashedIP = await generateHash(ip || "", "sha256");
-	let token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
+	const hashedIP = await generateHash(ip || "", "sha256");
+	const token = await Redis.getString(`token_${auth.user}_${hashedIP}`);
 	if (!Validate.token(token)) return { user: "", error: jsonError(Error.TOKEN_EXPIRED) };
 	if (!timingSafeEqual(auth.pass, token as string)) return { user: "", error: jsonError(Error.TOKEN_EXPIRED) };
 

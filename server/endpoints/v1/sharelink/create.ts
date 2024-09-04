@@ -31,8 +31,8 @@ export default async function handleShareLinkCreate(req: Request, match: Matched
 
 	const id = generateRandomText(15);
 
-	let timestamp = Date.now();
-	let result = await DB.prepareModify(
+	const timestamp = Date.now();
+	const result = await DB.prepareModify(
 		'INSERT INTO "ShareLinks"("Token","Path","Username","Password","Downloaded","Expiration","Created","Accessed") VALUES(?,?,?,?,?,?,?,?)',
 		[id, data.path, user, data.password, 0, data.expiration, timestamp, timestamp]
 	);

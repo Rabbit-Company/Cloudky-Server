@@ -14,7 +14,7 @@ export default async function handleAccountData(req: Request, match: MatchedRout
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
 	}
 
-	let result: any = await DB.prepare(
+	const result: any = await DB.prepare(
 		`
 		SELECT
 			"Email",

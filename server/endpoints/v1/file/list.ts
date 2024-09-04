@@ -27,7 +27,7 @@ export default async function handleFileList(req: Request, match: MatchedRoute |
 	if (result === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	if (!fromCache) {
-		let storageUsage = Math.floor(Storage.calculateStorageUsage(result));
+		const storageUsage = Math.floor(Storage.calculateStorageUsage(result));
 		await Redis.setString(`filelist_${user}`, JSON.stringify(result), 60, 300);
 		await Redis.setString(`storageUsage_${user}`, storageUsage.toString(), 60, 300);
 		await DB.prepareModify('UPDATE "Accounts" SET "StorageUsed" = ? WHERE "Username" = ?', [storageUsage, user]);

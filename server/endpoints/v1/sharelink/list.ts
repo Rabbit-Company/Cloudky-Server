@@ -14,7 +14,7 @@ export default async function handleShareLinkList(req: Request, match: MatchedRo
 		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
 	}
 
-	let results = await DB.prepare(
+	const results = await DB.prepare(
 		`
 		SELECT
 			"Token",

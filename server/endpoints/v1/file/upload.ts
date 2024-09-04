@@ -34,7 +34,7 @@ async function s3FileUpload(req: Request, username: string): Promise<Response> {
 
 	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
 
-	let res = await S3.getUserMultipartUploadLink(username, data.path);
+	const res = await S3.getUserMultipartUploadLink(username, data.path);
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 	return jsonResponse({ error: 0, info: "Success", link: res });
 }
@@ -62,7 +62,7 @@ async function localFileUpload(req: Request, username: string): Promise<Response
 		return jsonError(Error.MAX_FILE_SIZE_EXCEEDED);
 	}
 
-	let res = await Storage.uploadUserFile(username, key!, file);
+	const res = await Storage.uploadUserFile(username, key!, file);
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${username}`);

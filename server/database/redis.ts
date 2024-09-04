@@ -16,10 +16,10 @@ namespace Redis {
 
 	export async function getString(key: string, localTTL: number = 0): Promise<string | null> {
 		try {
-			let localValue = await Redis.localCache.get(key);
+			const localValue = await Redis.localCache.get(key);
 			if (localValue !== null) return localValue;
 
-			let externalValue = await Redis.externalCache.get(key);
+			const externalValue = await Redis.externalCache.get(key);
 			if (externalValue !== null) {
 				if (localTTL !== 0) await Redis.localCache.set(key, externalValue, "EX", localTTL);
 				return externalValue;
@@ -75,12 +75,12 @@ namespace Redis {
 	export async function getOrSetString(key: string, value: string, localTTL: number = 0, externalTTL: number = 0): Promise<string | null> {
 		try {
 			if (localTTL !== 0) {
-				let localValue = await Redis.localCache.get(key);
+				const localValue = await Redis.localCache.get(key);
 				if (localValue !== null) return localValue;
 			}
 
 			if (externalTTL !== 0) {
-				let externalValue = await Redis.externalCache.get(key);
+				const externalValue = await Redis.externalCache.get(key);
 				if (externalValue !== null) {
 					if (localTTL !== 0) await Redis.localCache.set(key, externalValue, "EX", localTTL);
 					return externalValue;

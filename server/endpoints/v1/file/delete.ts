@@ -25,7 +25,7 @@ export default async function handleFileDelete(req: Request, match: MatchedRoute
 
 	if (!Validate.userFilePathNames(data.paths)) return jsonError(Error.INVALID_FILE_NAME);
 
-	let res = await Storage.deleteUserFiles(user, data.paths);
+	const res = await Storage.deleteUserFiles(user, data.paths);
 	if (res === false) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${user}`);

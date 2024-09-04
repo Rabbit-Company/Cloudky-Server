@@ -12,7 +12,7 @@ namespace LocalStorage {
 			const glob = new Glob("**");
 			const path = `${process.env.DATA_DIRECTORY}/data/${username}/`;
 
-			let files: FileInformation[] = [];
+			const files: FileInformation[] = [];
 			for await (const fileName of glob.scan({ cwd: path, dot: true, onlyFiles: true, absolute: false })) {
 				let file = Bun.file(`${path}/${fileName}`);
 				files.push({
@@ -47,20 +47,20 @@ namespace LocalStorage {
 
 	export async function downloadUserFile(username: string, key: string, sharelink?: string): Promise<BunFile | null> {
 		try {
-			let file = Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`);
+			const file = Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`);
 			if (!(await file.exists())) return null;
 
-			let results: any = await DB.prepare(`SELECT "DownloadUsed", "DownloadLimit" FROM "Accounts" WHERE "Username" = ?`, [username]);
+			const results: any = await DB.prepare(`SELECT "DownloadUsed", "DownloadLimit" FROM "Accounts" WHERE "Username" = ?`, [username]);
 			if (results === null || results.length !== 1) return null;
 
 			const downloadUsed = file.size + results[0].DownloadUsed;
 			if (downloadUsed > results[0].DownloadLimit) return null;
 
-			let result2 = await DB.prepareModify('UPDATE "Accounts" SET "DownloadUsed" = ? WHERE "Username" = ?', [downloadUsed, username]);
+			const result2 = await DB.prepareModify('UPDATE "Accounts" SET "DownloadUsed" = ? WHERE "Username" = ?', [downloadUsed, username]);
 			if (!result2) return null;
 
 			if (sharelink) {
-				let result = await DB.prepareModify('UPDATE "ShareLinks" SET "Downloaded" = "Downloaded" + 1 WHERE "Token" = ?', [sharelink]);
+				const result = await DB.prepareModify('UPDATE "ShareLinks" SET "Downloaded" = "Downloaded" + 1 WHERE "Token" = ?', [sharelink]);
 				if (!result) return null;
 			}
 
@@ -75,7 +75,7 @@ namespace LocalStorage {
 			destination = `${process.env.DATA_DIRECTORY}/data/${username}/${destination}`;
 			await mkdir(destination, { recursive: true });
 			for (let i = 0; i < keys.length; i++) {
-				let file = `${process.env.DATA_DIRECTORY}/data/${username}/${keys[i]}`;
+				const file = `${process.env.DATA_DIRECTORY}/data/${username}/${keys[i]}`;
 				await rename(file, `${destination}/${path.basename(file)}`);
 			}
 			return true;

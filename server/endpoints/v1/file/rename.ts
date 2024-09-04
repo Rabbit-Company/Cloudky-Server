@@ -26,7 +26,7 @@ export default async function handleFileRename(req: Request, match: MatchedRoute
 	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
 	if (!Validate.userFilePathName(data.destination)) return jsonError(Error.INVALID_FILE_NAME);
 
-	let res = await Storage.renameUserFile(user, data.path, data.destination);
+	const res = await Storage.renameUserFile(user, data.path, data.destination);
 	if (res === false) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${user}`);

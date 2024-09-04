@@ -20,7 +20,7 @@ export default async function handleShareLinkDownload(req: Request, match: Match
 	if (!Validate.sharelink(data.link)) return jsonError(Error.INVALID_SHARE_LINK);
 	if (data.password !== null && !Validate.password(data.password)) return jsonError(Error.PASSWORD_NOT_HASHED);
 
-	let results = await DB.prepare(
+	const results = await DB.prepare(
 		`
 		SELECT
 			"Token",
@@ -46,12 +46,12 @@ export default async function handleShareLinkDownload(req: Request, match: Match
 	}
 
 	if (process.env.S3_ENABLED === "true") {
-		let res = await S3.getUserObjectLink(shareLink.Username, shareLink.Path);
+		const res = await S3.getUserObjectLink(shareLink.Username, shareLink.Path);
 		if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 		return jsonResponse({ error: 0, info: "Success", link: res });
 	}
 
-	let res = await LocalStorage.downloadUserFile(shareLink.Username, shareLink.Path, shareLink.Token);
+	const res = await LocalStorage.downloadUserFile(shareLink.Username, shareLink.Path, shareLink.Token);
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	const parts = shareLink.Path.split("/");

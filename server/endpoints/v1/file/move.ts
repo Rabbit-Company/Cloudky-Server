@@ -26,7 +26,7 @@ export default async function handleFileMove(req: Request, match: MatchedRoute |
 	if (!Validate.userFilePathNames(data.files)) return jsonError(Error.INVALID_FILE_NAME);
 	if (!Validate.userFilePathName(data.destination)) return jsonError(Error.INVALID_FILE_NAME);
 
-	let res = await Storage.moveUserFiles(user, data.files, data.destination);
+	const res = await Storage.moveUserFiles(user, data.files, data.destination);
 	if (res === false) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${user}`);

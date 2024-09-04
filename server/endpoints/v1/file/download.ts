@@ -26,12 +26,12 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
 
 	if (process.env.S3_ENABLED === "true") {
-		let res = await S3.getUserObjectLink(user, data.path);
+		const res = await S3.getUserObjectLink(user, data.path);
 		if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 		return jsonResponse({ error: 0, info: "Success", link: res });
 	}
 
-	let res = await LocalStorage.downloadUserFile(user, data.path);
+	const res = await LocalStorage.downloadUserFile(user, data.path);
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	const parts = data.path.split("/");
