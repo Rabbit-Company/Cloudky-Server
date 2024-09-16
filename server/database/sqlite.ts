@@ -1,7 +1,10 @@
 import Database from "bun:sqlite";
 
 namespace SQLite {
-	export const connection: Database = new Database(process.env.SQLITE_FILE || "cloudky.sqlite", { readwrite: true, create: true });
+	export const connection: Database = new Database(`${process.env.DATA_DIRECTORY}/databases/${process.env.SQLITE_FILE}`, {
+		readwrite: true,
+		create: true,
+	});
 
 	export function initialize() {
 		connection.run("PRAGMA journal_mode = WAL;");

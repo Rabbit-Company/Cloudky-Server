@@ -16,6 +16,7 @@ Metrics.initialize();
 
 Logger.level = Number(process.env.LOGGER_LEVEL) || 3;
 
+Logger.info(`[CS] Cloudky data directory: ${process.env.DATA_DIRECTORY}`);
 Logger.info(`[HS] HTTP Server listening on port ${process.env.SERVER_HOSTNAME}:${process.env.SERVER_PORT}`);
 
 const router = new Bun.FileSystemRouter({

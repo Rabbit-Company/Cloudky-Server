@@ -1,5 +1,6 @@
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
+data/
 cloudky-server
 *.sqlite
 *.sqlite-shm
@@ -15,7 +16,7 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# Caches 
+# Caches
 
 .cache
 

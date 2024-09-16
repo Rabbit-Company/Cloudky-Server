@@ -1,0 +1,71 @@
+services:
+  cloudky-server:
+    container_name: cloudky-server
+    build:
+      context: .
+    restart: always
+    environment:
+      #
+      # Change environment variables in .env file
+      #
+      # server
+      - SERVER_HOSTNAME=0.0.0.0
+      - SERVER_PORT=8085
+      - WEBSOCKET_PORT=8086
+      # redis
+      - REDIS_LOCAL=redis://cloudky-redis/
+      - REDIS_EXTERNAL=redis://cloudky-redis/
+      # account
+      - ACCOUNT_CREATION
+      - ACCOUNT_STORAGE_LIMIT
+      - ACCOUNT_DOWNLOAD_LIMIT
+      - ACCOUNT_UPLOAD_LIMIT
+      # dataabse
+      - DB_TYPE
+      - SQLITE_FILE
+      - MYSQL_HOST
+      - MYSQL_PORT
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MARIADB_HOST
+      - MARIADB_PORT
+      - MARIADB_DATABASE
+      - MARIADB_USER
+      - MARIADB_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - POSTGRES_DATABASE
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - CF_ACCOUNT_ID
+      - CF_API_KEY
+      - CF_DATABASE_ID
+      # data
+      - DATA_DIRECTORY=/usr/src/app/data
+      # S3 storage
+      - S3_ENABLED
+      - S3_ENDPOINT
+      - S3_REGION
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
+      - S3_BUCKET_NAME
+      # logger
+      - LOGGER_LEVEL
+      # metrics
+      - METRICS_TYPE
+      - METRICS_TOKEN
+      # scheduler
+      - SCHEDULER_METRICS_INTERVAL
+    ports:
+      - 8085:8085
+      - 8086:8086
+    volumes:
+      - ./data:/usr/src/app/data
+    depends_on:
+      - cloudky-redis
+
+  cloudky-redis:
+    image: redis:alpine
+    container_name: cloudky-redis
+    restart: always
