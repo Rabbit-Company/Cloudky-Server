@@ -34,7 +34,7 @@ async function s3FileUpload(req: Request, username: string): Promise<Response> {
 
 	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
 
-	const res = await S3.getUserMultipartUploadLink(username, data.path);
+	const res = S3.putUserObjectLink(username, data.path);
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 	return jsonResponse({ error: 0, info: "Success", link: res });
 }

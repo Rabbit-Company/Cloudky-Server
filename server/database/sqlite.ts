@@ -1,7 +1,7 @@
 import Database from "bun:sqlite";
 
 namespace SQLite {
-	export const connection: Database = new Database(`${process.env.DATA_DIRECTORY}/databases/${process.env.SQLITE_FILE}`, {
+	export const connection: Database = new Database(`${process.env.DATA_DIRECTORY}/${process.env.SQLITE_FILE}`, {
 		readwrite: true,
 		create: true,
 	});

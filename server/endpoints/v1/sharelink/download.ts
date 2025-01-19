@@ -46,7 +46,7 @@ export default async function handleShareLinkDownload(req: Request, match: Match
 	}
 
 	if (process.env.S3_ENABLED === "true") {
-		const res = await S3.getUserObjectLink(shareLink.Username, shareLink.Path);
+		const res = S3.getUserObjectLink(shareLink.Username, shareLink.Path);
 		if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 		return jsonResponse({ error: 0, info: "Success", link: res });
 	}
