@@ -1,6 +1,5 @@
 import Logger from "@rabbit-company/logger";
 import type { FileInformation } from "./storage";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import DB from "../database/database";
 import { S3Client } from "bun";
 

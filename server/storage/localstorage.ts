@@ -1,5 +1,4 @@
 import { Glob } from "bun";
-import { type _Object } from "@aws-sdk/client-s3";
 import type { FileInformation } from "./storage";
 import type { BunFile } from "bun";
 import { mkdir, unlink, rename, readdir, rm } from "fs/promises";

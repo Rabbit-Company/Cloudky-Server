@@ -1,4 +1,3 @@
-import { type _Object } from "@aws-sdk/client-s3";
 import S3 from "./s3storage";
 import LocalStorage from "./localstorage";
 
