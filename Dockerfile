@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY --chown=bun:bun package.json .npmrc ./
 COPY --chown=bun:bun server/ ./server/
 
-RUN mkdir -p ./data/databases/
+RUN mkdir -p ./data/
 
 RUN bun i
 
