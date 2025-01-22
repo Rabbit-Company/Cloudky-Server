@@ -150,7 +150,7 @@ if (process.env.S3_ENABLED !== "true") {
 					return;
 				}
 
-				await saveChunk(ws.data.chunkData, message);
+				await saveChunk(ws.data.chunkData, new Blob([message]));
 				await buildChunks(ws.data.chunkData);
 				ws.sendText(JSON.stringify({ chunks: ws.data.chunkData.chunks, completed: Array.from(ws.data.chunkData.completed), size: ws.data.chunkData.size }));
 			},

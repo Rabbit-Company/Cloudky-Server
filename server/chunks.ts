@@ -11,8 +11,8 @@ export interface ChunkData {
 	created: number;
 }
 
-export async function saveChunk(chunkData: ChunkData, data: Buffer): Promise<boolean> {
-	const hash = Blake2b.hash(data);
+export async function saveChunk(chunkData: ChunkData, data: Blob): Promise<boolean> {
+	const hash = Blake2b.hash(new Uint8Array(await data.arrayBuffer()));
 	if (!chunkData.chunks.includes(hash)) return false;
 	if (chunkData.completed.has(hash)) return false;
 
