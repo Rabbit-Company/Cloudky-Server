@@ -27,7 +27,7 @@
 	},
 	"homepage": "https://github.com/Rabbit-Company/Cloudky-Server#readme",
 	"devDependencies": {
-		"@types/bun": "^1.1.18",
+		"@types/bun": "^1.2.0",
 		"@types/pg": "^8.11.10"
 	},
 	"peerDependencies": {
