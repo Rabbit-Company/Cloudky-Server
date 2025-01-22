@@ -36,7 +36,7 @@ namespace Storage {
 		return await LocalStorage.deleteUserFiles(username, keys);
 	}
 
-	export async function uploadUserFile(username: string, key: string, body: any): Promise<boolean | null> {
+	export async function uploadUserFile(username: string, key: string, body: Blob): Promise<boolean | null> {
 		if (process.env.S3_ENABLED === "true") {
 			return await S3.uploadUserFile(username, key, body);
 		}

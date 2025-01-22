@@ -62,7 +62,7 @@ async function localFileUpload(req: Request, username: string): Promise<Response
 		return jsonError(Error.MAX_FILE_SIZE_EXCEEDED);
 	}
 
-	const res = await Storage.uploadUserFile(username, key!, file);
+	const res = await Storage.uploadUserFile(username, key!, new Blob([file], { type: file.type }));
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	await Redis.deleteString(`filelist_${username}`);

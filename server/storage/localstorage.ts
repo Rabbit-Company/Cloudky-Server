@@ -35,9 +35,40 @@ namespace LocalStorage {
 		}
 	}
 
-	export async function uploadUserFile(username: string, key: string, body: any): Promise<boolean> {
+	export async function uploadUserFile(username: string, key: string, body: Blob): Promise<boolean> {
 		try {
-			await Bun.write(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`, body, { createPath: true });
+			const filePath = `${process.env.DATA_DIRECTORY}/data/${username}/${key}`;
+			const file = Bun.file(filePath);
+
+			const fileSize = (await file.exists()) ? file.size : 0;
+
+			const results: any = await DB.prepare(
+				`
+				SELECT
+					"UploadUsed",
+					"UploadLimit",
+					"StorageUsed",
+					"StorageLimit"
+				FROM "Accounts" WHERE "Username" = ?
+				`,
+				[username]
+			);
+			if (results === null || results.length !== 1) return false;
+
+			const uploadUsed = results[0].UploadUsed + body.size;
+			if (uploadUsed > results[0].UploadLimit) return false;
+
+			const storageUsed = results[0].StorageUsed - fileSize + body.size;
+			if (storageUsed > results[0].StorageLimit) return false;
+
+			const result2 = await DB.prepareModify('UPDATE "Accounts" SET "UploadUsed" = ?, "StorageUsed" = ? WHERE "Username" = ?', [
+				uploadUsed,
+				storageUsed,
+				username,
+			]);
+			if (!result2) return false;
+
+			await Bun.write(filePath, body, { createPath: true });
 			return true;
 		} catch {
 			return false;

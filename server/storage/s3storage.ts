@@ -56,7 +56,7 @@ namespace S3 {
 		}
 	}
 
-	export async function putObject(key: string, body: any): Promise<boolean | null> {
+	export async function putObject(key: string, body: Blob): Promise<boolean | null> {
 		try {
 			await bucket.write(key, body);
 			return true;
@@ -88,7 +88,7 @@ namespace S3 {
 		return await deleteObjects(keys.map((key) => `data/${username}/${key}`));
 	}
 
-	export async function uploadUserFile(username: string, key: string, body: any): Promise<boolean | null> {
+	export async function uploadUserFile(username: string, key: string, body: Blob): Promise<boolean | null> {
 		return await putObject(`data/${username}/${key}`, body);
 	}
 
