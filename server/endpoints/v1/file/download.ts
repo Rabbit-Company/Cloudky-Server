@@ -43,7 +43,11 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	});
 
 	if (req.headers.get("if-none-match") === headers.get("ETag")) {
-		return new Response(null, { status: 304 });
+		return new Response(null, { headers: headers, status: 304 });
+	}
+
+	if (req.headers.get("if-modified-since") && res.lastModified <= new Date(req.headers.get("if-modified-since") || 0).getTime()) {
+		return new Response(null, { headers: headers, status: 304 });
 	}
 
 	const opts = { code: 200, start: 0, end: Infinity, range: false };
