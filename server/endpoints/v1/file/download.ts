@@ -37,7 +37,47 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	const parts = data.path.split("/");
 	const fileName = parts[parts.length - 1];
 
-	const response = new Response(res);
-	response.headers.set("Content-Disposition", `attachment; filename="${fileName}"`);
-	return response;
+	const headers = new Headers({
+		"Content-Length": "" + res.size,
+		"Last-Modified": new Date(res.lastModified).toUTCString(),
+		ETag: `W/"${res.size}-${res.lastModified}"`,
+		"Content-Disposition": `attachment; filename="${fileName}"`,
+	});
+
+	if (req.headers.get("if-none-match") === headers.get("ETag")) {
+		return new Response(null, { status: 304 });
+	}
+
+	const opts = { code: 200, start: 0, end: Infinity, range: false };
+
+	if (req.headers.has("range")) {
+		opts.code = 206;
+		let [x, y] = req.headers.get("range")!.replace("bytes=", "").split("-");
+		let end = (opts.end = parseInt(y, 10) || res.size - 1);
+		let start = (opts.start = parseInt(x, 10) || 0);
+
+		if (start >= res.size || end >= res.size) {
+			headers.set("Content-Range", `bytes */${res.size}`);
+			return new Response(null, {
+				headers: headers,
+				status: 416,
+			});
+		}
+
+		headers.set("Content-Range", `bytes ${start}-${end}/${res.size}`);
+		headers.set("Content-Length", "" + (end - start + 1));
+		headers.set("Accept-Ranges", "bytes");
+		opts.range = true;
+	}
+
+	if (opts.range) {
+		return new Response(res.slice(opts.start, opts.end + 1), {
+			headers,
+			status: opts.code,
+		});
+	}
+
+	return new Response(res, {
+		headers,
+	});
 }
