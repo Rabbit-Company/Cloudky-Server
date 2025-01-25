@@ -5,6 +5,7 @@ import LocalStorage from "../../../storage/localstorage";
 import Metrics from "../../../metrics";
 import Validate from "../../../validate";
 import { Error } from "../../../errors";
+import Blake2b from "@rabbit-company/blake2b";
 
 export default async function handleFileDownload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if (req.method !== "POST") return jsonError(Error.INVALID_ENDPOINT);
@@ -34,14 +35,11 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 	const res = await LocalStorage.downloadUserFile(user, data.path);
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 
-	const parts = data.path.split("/");
-	const fileName = parts[parts.length - 1];
-
 	const headers = new Headers({
 		"Content-Length": "" + res.size,
 		"Last-Modified": new Date(res.lastModified).toUTCString(),
-		ETag: `W/"${res.size}-${res.lastModified}"`,
-		"Content-Disposition": `attachment; filename="${fileName}"`,
+		ETag: Blake2b.hash(`${res.size}-${res.lastModified}`),
+		"Content-Disposition": `attachment; filename="${data.path.split("/").pop()}"`,
 	});
 
 	if (req.headers.get("if-none-match") === headers.get("ETag")) {
@@ -52,16 +50,13 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 
 	if (req.headers.has("range")) {
 		opts.code = 206;
-		let [x, y] = req.headers.get("range")!.replace("bytes=", "").split("-");
-		let end = (opts.end = parseInt(y, 10) || res.size - 1);
-		let start = (opts.start = parseInt(x, 10) || 0);
+		const range = req.headers.get("range")!.replace("bytes=", "").split("-");
+		const start = (opts.start = parseInt(range[0], 10) || 0);
+		const end = (opts.end = parseInt(range[1], 10) || res.size - 1);
 
 		if (start >= res.size || end >= res.size) {
 			headers.set("Content-Range", `bytes */${res.size}`);
-			return new Response(null, {
-				headers: headers,
-				status: 416,
-			});
+			return new Response(null, { headers: headers, status: 416 });
 		}
 
 		headers.set("Content-Range", `bytes ${start}-${end}/${res.size}`);
@@ -70,14 +65,6 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 		opts.range = true;
 	}
 
-	if (opts.range) {
-		return new Response(res.slice(opts.start, opts.end + 1), {
-			headers,
-			status: opts.code,
-		});
-	}
-
-	return new Response(res, {
-		headers,
-	});
+	const responseBody = opts.range ? res.slice(opts.start, opts.end + 1) : res;
+	return new Response(responseBody, { headers, status: opts.code });
 }
