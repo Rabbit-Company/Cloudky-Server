@@ -44,7 +44,7 @@ async function localFileDownloadToken(req: Request, ip: string | undefined): Pro
 		user: user,
 		path: data.path,
 	};
-	const activated = await Redis.setString(`download_token_${token}`, JSON.stringify(tokenData), 60, 60);
+	const activated = await Redis.setString(`download_token_${token}`, JSON.stringify(tokenData), 864000, 864000);
 	if (!activated) return jsonError(Error.UNKNOWN_ERROR);
 
 	return jsonResponse({ token: token });
@@ -57,8 +57,6 @@ async function localFileDownload(req: Request, ip: string | undefined): Promise<
 
 	const tokenData = await Redis.getString(`download_token_${token}`);
 	if (!tokenData) return jsonError(Error.TOKEN_EXPIRED);
-
-	await Redis.deleteString(`download_token_${token}`);
 
 	let data;
 	try {
