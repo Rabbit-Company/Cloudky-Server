@@ -1,14 +1,32 @@
 import type { MatchedRoute } from "bun";
-import { authenticateUser, jsonError, jsonResponse } from "../../../utils";
+import { authenticateUser, generateRandomText, jsonError, jsonResponse } from "../../../utils";
 import S3 from "../../../storage/s3storage";
 import LocalStorage from "../../../storage/localstorage";
 import Metrics from "../../../metrics";
 import Validate from "../../../validate";
 import { Error } from "../../../errors";
 import Blake2b from "@rabbit-company/blake2b";
+import Redis from "../../../database/redis";
 
 export default async function handleFileDownload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
-	if (req.method !== "POST") return jsonError(Error.INVALID_ENDPOINT);
+	if (req.method === "POST" && process.env.S3_ENABLED === "true") {
+		return await s3FileDownload(req, ip);
+	} else if (req.method === "POST" && process.env.S3_ENABLED === "false") {
+		return await localFileDownloadToken(req, ip);
+	} else if (req.method === "GET" && process.env.S3_ENABLED === "false") {
+		return await localFileDownload(req, ip);
+	} else {
+		return jsonError(Error.INVALID_ENDPOINT);
+	}
+}
+
+async function localFileDownloadToken(req: Request, ip: string | undefined): Promise<Response> {
+	const { user, error } = await authenticateUser(req, ip);
+	if (error) return error;
+
+	if (Number(process.env.METRICS_TYPE) >= 3) {
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
+	}
 
 	let data: any;
 	try {
@@ -17,22 +35,41 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 		return jsonError(Error.REQUIRED_DATA_MISSING);
 	}
 
-	const { user, error } = await authenticateUser(req, ip);
-	if (error) return error;
-
-	if (Number(process.env.METRICS_TYPE) >= 3) {
-		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
-	}
-
 	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
 
-	if (process.env.S3_ENABLED === "true") {
-		const res = S3.getUserObjectLink(user, data.path);
-		if (res === null) return jsonError(Error.UNKNOWN_ERROR);
-		return jsonResponse({ error: 0, info: "Success", link: res });
+	if (!(await LocalStorage.userFileExists(user, data.path))) return jsonError(Error.FILE_NOT_FOUND);
+
+	const token = generateRandomText(128);
+	const tokenData = {
+		user: user,
+		path: data.path,
+	};
+	const activated = await Redis.setString(`download_token_${token}`, JSON.stringify(tokenData), 60, 60);
+	if (!activated) return jsonError(Error.UNKNOWN_ERROR);
+
+	return jsonResponse({ token: token });
+}
+
+async function localFileDownload(req: Request, ip: string | undefined): Promise<Response> {
+	const token = new URL(req.url).searchParams.get("token");
+
+	if (!Validate.token(token)) return jsonError(Error.INVALID_TOKEN);
+
+	const tokenData = await Redis.getString(`download_token_${token}`);
+	if (!tokenData) return jsonError(Error.TOKEN_EXPIRED);
+
+	await Redis.deleteString(`download_token_${token}`);
+
+	let data;
+	try {
+		data = JSON.parse(tokenData);
+	} catch {
+		return jsonError(Error.TOKEN_EXPIRED);
 	}
 
-	const res = await LocalStorage.downloadUserFile(user, data.path);
+	if (typeof data.user !== "string" || typeof data.path !== "string") return jsonError(Error.TOKEN_EXPIRED);
+
+	const res = await LocalStorage.downloadUserFile(data.user, data.path);
 	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
 
 	const headers = new Headers({
@@ -71,4 +108,26 @@ export default async function handleFileDownload(req: Request, match: MatchedRou
 
 	const responseBody = opts.range ? res.slice(opts.start, opts.end + 1) : res;
 	return new Response(responseBody, { headers, status: opts.code });
+}
+
+async function s3FileDownload(req: Request, ip: string | undefined): Promise<Response> {
+	const { user, error } = await authenticateUser(req, ip);
+	if (error) return error;
+
+	if (Number(process.env.METRICS_TYPE) >= 3) {
+		Metrics.http_auth_requests_total.labels(new URL(req.url).pathname, user).inc();
+	}
+
+	let data: any;
+	try {
+		data = await req.json();
+	} catch {
+		return jsonError(Error.REQUIRED_DATA_MISSING);
+	}
+
+	if (!Validate.userFilePathName(data.path)) return jsonError(Error.INVALID_FILE_NAME);
+
+	const res = S3.getUserObjectLink(user, data.path);
+	if (res === null) return jsonError(Error.UNKNOWN_ERROR);
+	return jsonResponse({ error: 0, info: "Success", link: res });
 }
