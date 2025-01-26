@@ -26,7 +26,8 @@ export enum Error {
 	NON_EXISTENT_SHARE_LINK = 1022,
 	INVALID_SHARE_LINK = 1023,
 	INVALID_OTP = 1024,
-	FILE_NOT_FOUND = 1025,
+	PASSWORD_TOO_WEAK = 1025,
+	FILE_NOT_FOUND = 1026,
 	UNKNOWN_ERROR = 2000,
 	INSUFFICIENT_PERMISSIONS = 9999,
 }
@@ -60,7 +61,8 @@ namespace Errors {
 		1022: { message: "Share Link can not be created on non-existing file or folder.", httpCode: 400 },
 		1023: { message: "Provided share link is invalid.", httpCode: 400 },
 		1024: { message: "Provided OTP is invalid.", httpCode: 400 },
-		1025: { message: "File not found on the provided file path.", httpCode: 404 },
+		1025: { message: "Your password is too weak!", httpCode: 400 },
+		1026: { message: "File not found on the provided file path.", httpCode: 404 },
 		2000: { message: "Something went wrong while trying to perform this action. Please try again later.", httpCode: 500 },
 		9999: { message: "Your do not have permission to perform this action.", httpCode: 403 },
 	};
