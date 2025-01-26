@@ -19,6 +19,8 @@ export default async function handleFileUpload(req: Request, match: MatchedRoute
 		return await s3FileUpload(req, user);
 	} else if (req.method === "PUT" && process.env.S3_ENABLED !== "true") {
 		return await localFileUpload(req, user);
+	} else if (req.method === "PATCH" && process.env.S3_ENABLED !== "true") {
+		return await localFilePatch(req, user);
 	} else {
 		return jsonError(Error.INVALID_ENDPOINT);
 	}
@@ -67,5 +69,9 @@ async function localFileUpload(req: Request, username: string): Promise<Response
 
 	await Redis.deleteString(`filelist_${username}`);
 
+	return jsonError(Error.SUCCESS);
+}
+
+async function localFilePatch(req: Request, username: string): Promise<Response> {
 	return jsonError(Error.SUCCESS);
 }

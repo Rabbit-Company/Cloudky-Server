@@ -109,8 +109,8 @@ describe("endpoints", () => {
 			},
 			body: JSON.stringify({ path: "test/test2.txt" }),
 		});
-		const fileContent = await res.text();
-		expect(fileContent).toBe("Hello World!");
+		const data = (await res.json()) as { error: number; info: string; token?: string };
+		expect(data?.error).toBe(0);
 	});
 
 	test("sharelink create", async () => {

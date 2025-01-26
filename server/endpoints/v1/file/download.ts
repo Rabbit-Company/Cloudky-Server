@@ -11,9 +11,9 @@ import Redis from "../../../database/redis";
 export default async function handleFileDownload(req: Request, match: MatchedRoute | null, ip: string | undefined): Promise<Response> {
 	if (req.method === "POST" && process.env.S3_ENABLED === "true") {
 		return await s3FileDownload(req, ip);
-	} else if (req.method === "POST" && process.env.S3_ENABLED === "false") {
+	} else if (req.method === "POST" && process.env.S3_ENABLED !== "true") {
 		return await localFileDownloadToken(req, ip);
-	} else if (req.method === "GET" && process.env.S3_ENABLED === "false") {
+	} else if (req.method === "GET" && process.env.S3_ENABLED !== "true") {
 		return await localFileDownload(req, ip);
 	} else {
 		return jsonError(Error.INVALID_ENDPOINT);
@@ -47,7 +47,7 @@ async function localFileDownloadToken(req: Request, ip: string | undefined): Pro
 	const activated = await Redis.setString(`download_token_${token}`, JSON.stringify(tokenData), 864000, 864000);
 	if (!activated) return jsonError(Error.UNKNOWN_ERROR);
 
-	return jsonResponse({ token: token });
+	return jsonResponse({ error: 0, info: "Success", token: token });
 }
 
 async function localFileDownload(req: Request, ip: string | undefined): Promise<Response> {
