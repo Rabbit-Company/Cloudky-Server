@@ -47,7 +47,7 @@ async function localFileDownloadToken(req: Request, ip: string | undefined): Pro
 	const activated = await Redis.setString(`download_token_${token}`, JSON.stringify(tokenData), 864000, 864000);
 	if (!activated) return jsonError(Error.UNKNOWN_ERROR);
 
-	return jsonResponse({ error: 0, info: "Success", token: token });
+	return jsonResponse({ error: 0, info: "Success", link: `${req.url}?token=${token}` });
 }
 
 async function localFileDownload(req: Request, ip: string | undefined): Promise<Response> {
