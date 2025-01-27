@@ -50,19 +50,27 @@ describe("endpoints", () => {
 	});
 
 	test("file upload", async () => {
-		const formData = new FormData();
-		formData.append("name", "test.txt");
-		formData.append("file", new Blob(["Hello World!"], { type: "text/plain" }));
-
 		const res = await fetch("http://0.0.0.0:8085/v1/file/upload", {
+			method: "POST",
+			headers: {
+				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
+			},
+			body: JSON.stringify({
+				path: "test.txt",
+			}),
+		});
+		const data = (await res.json()) as { error: number; info: string; link?: string };
+		if (!data.link) return;
+
+		const res2 = await fetch(data.link, {
 			method: "PUT",
 			headers: {
 				Authorization: "Basic " + Buffer.from(username + ":" + token).toString("base64"),
 			},
-			body: formData,
+			body: new Blob(["Hello World!"]),
 		});
-		const data = (await res.json()) as { error: number; info: string };
-		expect(data?.error).toBe(0);
+		const data2 = (await res2.json()) as { error: number; info: string };
+		expect(data2?.error).toBe(0);
 	});
 
 	test("file list", async () => {

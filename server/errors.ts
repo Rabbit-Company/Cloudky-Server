@@ -46,7 +46,7 @@ namespace Errors {
 		1007: { message: "Username is already registered.", httpCode: 409 },
 		1008: { message: "Provided API Secret Key in Bearer Token is invalid.", httpCode: 401 },
 		1009: { message: "Provided email is invalid.", httpCode: 400 },
-		1010: { message: "Max file size is 50GB.", httpCode: 413 },
+		1010: { message: "Max file size is 5GB with PUT method.", httpCode: 413 },
 		1011: { message: "Username and Password are missing in Authorization header.", httpCode: 401 },
 		1012: { message: "Provided username is invalid.", httpCode: 400 },
 		1013: { message: "Provided password is invalid.", httpCode: 400 },
