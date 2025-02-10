@@ -91,6 +91,70 @@ async function localFileUpload(req: Request, ip: string | undefined): Promise<Re
 }
 
 async function localFilePatch(req: Request, ip: string | undefined): Promise<Response> {
+	const token = new URL(req.url).searchParams.get("token");
+
+	if (!Validate.token(token)) return jsonError(Error.INVALID_TOKEN);
+
+	const tokenData = await Redis.getString(`upload_token_${token}`);
+	if (!tokenData) return jsonError(Error.TOKEN_EXPIRED);
+
+	let data;
+	try {
+		data = JSON.parse(tokenData);
+	} catch {
+		return jsonError(Error.TOKEN_EXPIRED);
+	}
+
+	if (typeof data.user !== "string" || typeof data.path !== "string") return jsonError(Error.TOKEN_EXPIRED);
+
+	const range = req.headers.get("Content-Range");
+	if (!range) {
+		return jsonError(Error.MISSING_RANGE_HEADER);
+	}
+
+	const match = range.match(/bytes (\d+)-(\d+)\/(\d+)/);
+	if (!match) {
+		return jsonError(Error.INVALID_RANGE_HEADER);
+	}
+
+	const [, startStr, endStr, totalStr] = match;
+	const start = parseInt(startStr, 10);
+	const end = parseInt(endStr, 10);
+	const total = parseInt(totalStr, 10);
+
+	if (isNaN(start) || isNaN(end) || isNaN(total) || start > end || end >= total) {
+		return jsonError(Error.INVALID_RANGE_VALUES);
+	}
+
+	const contentLength = req.headers.get("Content-Length");
+	if (!contentLength || parseInt(contentLength, 10) !== end - start + 1) {
+		return jsonError(Error.CONTENT_LENGTH_MISMATCH);
+	}
+
+	const chunk = await req.blob();
+
+	if (chunk.size === 0) {
+		return jsonError(Error.INVALID_FILE_CHUNK);
+	}
+
+	if (chunk.size !== end - start + 1) {
+		return jsonError(Error.CHUNK_SIZE_MISMATCH);
+	}
+
+	const filePath = `${process.env.DATA_DIRECTORY}/data/${data.user}/${data.path}`;
+
+	// Wait for Bun to implement file append function.
+	//await Bun.write(filePath, new Uint8Array(total), { create: true });
+	//await Bun.write(filePath, chunk);
+
+	const fileStat = await Bun.file(filePath).stat();
+	const isComplete = fileStat.size >= total;
+
+	if (!isComplete) {
+		return jsonError(Error.PARTIAL_SUCCESS);
+	}
+
+	await Redis.deleteString(`filelist_${data.user}`);
 	return jsonError(Error.SUCCESS);
 }
 

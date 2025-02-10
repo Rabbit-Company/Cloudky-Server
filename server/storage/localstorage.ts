@@ -75,6 +75,26 @@ namespace LocalStorage {
 		}
 	}
 
+	export async function appendUserFileChunk(user: string, path: string, chunk: Blob, start: number, end: number, total: number): Promise<boolean> {
+		try {
+			const filePath = `${process.env.DATA_DIRECTORY}/data/${user}/${path}`;
+
+			// Wait for Bun to implement file append function.
+			//await Bun.write(filePath, new Uint8Array(total), { create: true });
+			//const chunkArrayBuffer = await chunk.arrayBuffer();
+			//const chunkUint8Array = new Uint8Array(chunkArrayBuffer);
+			//const file = await Bun.file(path);
+			//await file.write(chunkUint8Array, start);
+
+			const fileStat = await Bun.file(filePath).stat();
+			const isComplete = fileStat.size >= total;
+
+			return isComplete;
+		} catch (error) {
+			return false;
+		}
+	}
+
 	export async function downloadUserFile(username: string, key: string, sharelink?: string): Promise<BunFile | null> {
 		try {
 			const file = Bun.file(`${process.env.DATA_DIRECTORY}/data/${username}/${key}`);

@@ -27,7 +27,7 @@
 	},
 	"homepage": "https://github.com/Rabbit-Company/Cloudky-Server#readme",
 	"devDependencies": {
-		"@types/bun": "^1.2.1",
+		"@types/bun": "^1.2.2",
 		"@types/pg": "^8.11.11"
 	},
 	"peerDependencies": {
@@ -37,7 +37,7 @@
 		"@rabbit-company/blake2b": "npm:@jsr/rabbit-company__blake2b@2.1.1",
 		"@rabbit-company/logger": "npm:@jsr/rabbit-company__logger@4.0.1",
 		"d1-api": "^0.1.0",
-		"ioredis": "^5.4.2",
+		"ioredis": "^5.5.0",
 		"mariadb": "^3.4.0",
 		"mysql2": "^3.12.0",
 		"pg": "^8.13.1",
