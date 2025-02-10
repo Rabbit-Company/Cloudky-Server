@@ -1,7 +1,7 @@
 import { Glob } from "bun";
 import type { FileInformation } from "./storage";
 import type { BunFile } from "bun";
-import { mkdir, unlink, rename, readdir, rm } from "fs/promises";
+import { mkdir, rename, rm } from "fs/promises";
 import path from "node:path";
 import DB from "../database/database";
 
@@ -153,7 +153,9 @@ namespace LocalStorage {
 			await Promise.all(
 				keys.map(async (key) => {
 					const filePath = `${dirPath}/${key}`;
-					if (await Bun.file(filePath).exists()) await unlink(filePath);
+					const file = Bun.file(filePath);
+
+					if (await file.exists()) await file.delete();
 
 					const parentDir = filePath.substring(0, filePath.lastIndexOf("/"));
 
